@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome -- Get Form</title>
+    <script>
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+
+            const params = new URLSearchParams();
+            params.append('name', name);
+            params.append('age', age);
+
+            const url = `/get/form?${params.toString()}`;
+            const xhr = new XMLHttpRequest();
+            xhr.open('GET', url, true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    document.getElementById('message').textContent = response.message;
+                }
+            };
+            xhr.send();
+        }
+    </script>
+</head>
+<body>
+    <h2>Welcome get form</h2>
+    <label>
+        Name:
+        <input type="text" id="name">
+    </label>
+    <br>
+    <br>
+    <label>
+        Age:
+        <input type="number" id="age">
+    </label>
+    <br>
+    <br>
+    <button onclick="submitForm()">Submit</button>
+    <p id="message"></p>
+</body>
+</html>

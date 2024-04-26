@@ -1,0 +1,22 @@
+{
+    "type": "object",
+    "properties": {
+        "age": {
+            "type": "integer"
+        },
+        "current_time": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "occupation": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "age",
+        "current_time",
+        "name"
+    ]
+}

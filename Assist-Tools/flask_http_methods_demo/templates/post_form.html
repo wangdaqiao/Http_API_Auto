@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome</title>
+    <script>
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/post/form', true);
+            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    document.getElementById('message').textContent = response.message;
+                }
+            };
+            xhr.send(`name=${name}&age=${age}`);
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome Post Form</h1>
+    <label>
+        Name:
+        <input type="text" id="name">
+    </label>
+    <br>
+    <br>
+    <label>
+        Age:
+        <input type="number" id="age">
+    </label>
+    <br>
+    <br>
+    <button onclick="submitForm()">Submit</button>
+    <p id="message"></p>
+</body>
+</html>

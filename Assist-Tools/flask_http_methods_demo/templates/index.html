@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+
+{% block title %}Homepage{% endblock %}
+
+{% block body %}
+    <h1>Welcome to My Website</h1>
+    <p>This is index</p>
+    <p>Here are some links to other pages on this website:</p>
+    <ul>
+        <li><a href="/get/form">GET form</a></li>
+        <li><a href="/get/json">GET json</a></li>
+        <li><a href="/post/form">POST form</a></li>
+        <li><a href="/post/json">POST json</a></li>
+        <li><a href="/post/err502">POST json 502</a></li>
+        <li><a href="/put/user">PUT json</a></li>
+    </ul>
+
+{% endblock %}

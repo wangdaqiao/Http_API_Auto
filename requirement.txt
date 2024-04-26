@@ -1,0 +1,11 @@
+requests
+pytest
+pytest-rerunfailures
+pytest-sugar
+pytest-xdist
+allure-pytest
+loguru
+jsonpath
+jsonschema
+pandas
+pyyaml

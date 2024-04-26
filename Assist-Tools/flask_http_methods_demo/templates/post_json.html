@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Welcome -- Post Json</title>
+    <script>
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+            const data = {
+                name: name,
+                age: age
+            };
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/post/json', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    const response = JSON.parse(xhr.responseText);
+                    document.getElementById('message').textContent = response.message;
+                }
+            };
+            xhr.send(JSON.stringify(data));
+        }
+    </script>
+</head>
+<body>
+    <h1>Welcome post json</h1>
+    <label>
+        Name:
+        <input type="text" id="name">
+    </label>
+    <br>
+    <br>
+    <label>
+        Age:
+        <input type="number" id="age">
+    </label>
+    <br>
+    <br>
+    <button onclick="submitForm()">Submit</button>
+    <p id="message"></p>
+</body>
+</html>

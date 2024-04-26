@@ -1,0 +1,42 @@
+# run env_name: could be [test, stage, prod]
+run_env: test
+
+
+case_pytest_lst:
+    - ['-n', '2', '--dist=loadfile', '-m', 'm1']
+
+
+case_pytest_lst_another_sample:
+    - ['-m', 'm1 and part1']
+    - ['-m', 'm1 and part2']
+
+
+test:
+    base_url: 'https://api.test***.com'
+    # priority： case priority to run
+    priorities: ['p0', 'p1']
+    email: 'your_email@****.**'
+    password: 'your_password'
+    admin_account: 'your_admin_account'
+    admin_password: 'your_password'
+
+
+stage:
+    base_url: 'https://stageapi.test***.com'
+    # priority： case priority to run
+    priorities: ['p0', 'p1']
+    email: 'your_email@****.**'
+    password: 'your_password'
+    admin_account: 'your_admin_account'
+    admin_password: 'your_password'
+
+
+prod:
+    base_url: 'https://api.yourapp.com'
+    # priority： case priority to run
+    priorities: ['p1',]
+    email: 'your_email@****.**'
+    password: 'your_password'
+    admin_account: 'your_admin_account'
+    admin_password: 'your_password'
+

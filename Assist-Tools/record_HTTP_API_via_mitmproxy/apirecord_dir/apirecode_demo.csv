@@ -1,0 +1,4 @@
+request_url,host,status_code,method,data_type,params,payload,payload_length,upload_file,response_text,response_length,response_duration_time,finish_time
+/hello/Ronaldo,127.0.0.1,200,GET,params,,,,,"{""current_time"": ""2024-04-21 19:46:15"", ""name"": ""Ronaldo"", ""path"": ""/hello/Ronaldo""}",93,0.0,20240421-19:46:15
+/put/user,127.0.0.1,200,PUT,json,,"{""name"": ""Tom"", ""age"": ""8""}",27,,"{""age"": 8, ""message"": ""User tom age 8 updated successfully."", ""name"": ""Tom"", ""path"": ""/put/user""}",108,0.01,20240421-19:46:18
+/post/form,127.0.0.1,200,POST,data,,"{""name"": ""John"", ""age"": ""25""}",29,,"{""age"": ""25"", ""message"": ""Welcome John, you are 25 years old."", ""name"": ""John"", ""path"": ""/post/form""}",112,0.01,20240421-19:46:20

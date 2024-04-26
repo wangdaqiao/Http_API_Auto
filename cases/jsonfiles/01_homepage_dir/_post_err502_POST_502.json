@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "properties": {
+        "msg": {
+            "type": "string",
+            "pattern":"Internal Server Error 502"
+        }
+    },
+    "required": [
+        "error"
+    ]
+}

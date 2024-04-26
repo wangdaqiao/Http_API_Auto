@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Flask XHR Example - 502err</title>
+</head>
+<body>
+    <h1>post json 502 err</h1>
+    <label>
+        please enter your name
+    </label>
+    <br></br>
+    <input type="text" id="name" placeholder="Enter your name">
+    <br></br>
+    <button onclick="submitName()">Submit</button>
+    <br></br>
+    <div id="error-message"></div>
+
+    <script>
+        function submitName() {
+            const xhr = new XMLHttpRequest();
+            const name = document.getElementById('name').value;
+            xhr.open('POST', '/post/err502', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            const data = { name: name };
+            xhr.send(JSON.stringify(data));
+            xhr.onload = function() {
+                if (xhr.status === 502) {
+                    const errorMessage = document.getElementById('error-message');
+<!--                    errorMessage.textContent = 'Error 502: ' + xhr.responseText;-->
+                    errorMessage.textContent = 'Error: Internal Server Error 502';
+                }
+            };
+        }
+    </script>
+</body>
+</html>

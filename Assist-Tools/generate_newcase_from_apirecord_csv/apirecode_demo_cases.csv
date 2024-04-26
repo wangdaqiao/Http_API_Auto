@@ -1,0 +1,3 @@
+request_url,method,data_type,params,payload,upload_file,json_schema_file,status_code,var_extract,run_env,test_account,priority,page_url,remark
+/hello/Ronaldo,GET,params,,,,_hello_Ronaldo_GET_200.json,200,,all,all,p0,,
+/put/user,PUT,json,,"{""name"": ""Tom"", ""age"": ""8""}",,_put_user_PUT_200.json,200,,all,all,p0,,

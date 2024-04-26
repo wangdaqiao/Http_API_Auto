@@ -1,0 +1,12 @@
+{
+    "type": "object",
+    "properties": {
+        "msg": {
+            "type": "string",
+            "pattern":"uploaded successful$"
+        }
+    },
+    "required": [
+        "msg"
+    ]
+}

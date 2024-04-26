@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Update User</title>
+</head>
+<body>
+  <h1>Update User</h1>
+  <form id="update-user-form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" required>
+    <br>
+    <br>
+    <label for="age">Age:</label>
+    <input type="number" id="age" name="age" required>
+    <br>
+    <br>
+    <button type="submit">Update</button>
+  </form>
+  <div id="message"></div>
+  <script>
+  document.getElementById('update-user-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    var name = document.getElementById('name').value;
+    var age = document.getElementById('age').value;
+    var data = { name: name, age: age };
+    var xhr = new XMLHttpRequest();
+    xhr.open('PUT', '/put/user', true);
+    xhr.setRequestHeader('Content-Type', 'application/json');
+    xhr.onload = function() {
+      if (xhr.status === 200) {
+        var response = JSON.parse(xhr.responseText);
+        document.getElementById('message').textContent = response.message;
+      } else {
+        console.error(xhr.responseText);
+      }
+    };
+    xhr.onerror = function() {
+      console.error('Network error.');
+    };
+    xhr.send(JSON.stringify(data));
+  });
+  </script>
+</body>
+</html>
