@@ -1,0 +1,6 @@
+request_url,method,data_type,params,json_schema_file,status_code,payload,upload_file,var_extract,run_env,test_account,priority,page_url,remark
+/post/form,POST,data,,_post_form_POST_200.json,200,"{""name"": ""中国"", ""heloo"": false, ""age"": ""19""}",,,all,all,p0,http://127.0.0.1:5000/post/form,
+/put/user,PUT,json,,_put_user_PUT_200.json,200,"{""name"": ""Firefox02"", ""age"": ""7""}",,,all,all,p0,http://127.0.0.1:5000/put/user,
+/post/err502,POST,json,,_post_err502_POST_502.json,502,"{""name"": ""For502""}",,,all,all,p0,http://127.0.0.1:5000/post/err502,
+/post/form,POST,data,,_post_form_POST_200.json,200,"{""name"": ""TJD"", ""age"": 39}",,"{""name"": ""$..name""}",all,all,p0,http://127.0.0.1:5000/post/form,
+/post/form,POST,data,,_post_form_POST_200.json,"[200, 503]","{""name"": ""${name}"", ""age"": ""30""}",,,all,all,p0,http://127.0.0.1:5000/post/form,

@@ -27,27 +27,21 @@ from config import base_config
 email = base_config.email
 password = base_config.password
 
-date_hour_minute_str = base_config.date_hour_minute_str
 cur_filename, _ = os.path.splitext(os.path.basename(__file__))
-logfile = os.path.join(base_config.logs_dir, f'API_{date_hour_minute_str}_{cur_filename}.log')
-csv_lst = [x for x in os.listdir(cur_dir) if x.endswith('.csv')]
-# csv_lst = ['01_homepage_demo.csv', ]
-logger.debug(f'{csv_lst=}')
-data_total = list()
-for csv_file in csv_lst:
-    case_lst = csv_parse.csv_to_cases(csvfile_input=os.path.join(cur_dir, csv_file), email=email)
-    data_total.extend(case_lst)
-logger.debug(f'case number: {len(data_total)}')
-# logger.info(f'{data_total=}')
-case_ids = common_funs.case_ids_define(data_total)
+logfile = os.path.join(base_config.logs_dir, f'API_{base_config.date_hour_minute_str}_{cur_filename}.log')
+cases_total: list = csv_parse.cases_from_csv_dir(csv_dir=cur_dir, email=email)
+# cases_total = csv_parse.csv_to_cases(csvfile_input=os.path.join(cur_dir, '01_feature_a2.csv'), email=email)
+case_ids: list = common_funs.case_ids_define(cases_total)
 vars_dct = {}
 
 
 def setup_module():
     vars_dct['t1'] = time.time()
-    # logger.remove()
+    logger.remove()
     logger.add(logfile, level="INFO", enqueue=True)
+    logger.info(f'{cases_total=}')
     logger.info('setup_module starts.')
+    logger.debug(f'case number: {len(cases_total)}')
 
 
 def teardown_module():
@@ -58,12 +52,12 @@ def teardown_module():
 
 # @pytest.mark.flaky(reruns=1, reruns_delay=3)
 @pytest.mark.part1
-@pytest.mark.parametrize('case_data', data_total, ids=case_ids)
-class TestSuite_01_HomePage_APIs(object):
+@pytest.mark.parametrize('case_data', cases_total, ids=case_ids)
+class TestSuite_01_FeatureA_APIs(object):
     @staticmethod
     @pytest.mark.runall
     @pytest.mark.m1
-    def test_01_homepage_api(case_data):
+    def test_01_feature_a_api(case_data):
         func_name = sys._getframe().f_code.co_name
         logger.info(f'{func_name} begin. {case_data=}')
         # step 1: send http request
@@ -77,12 +71,12 @@ class TestSuite_01_HomePage_APIs(object):
         status_code = request_info.get('status_code')
         # step 2: extract variables
         if var_extract:
-            logger.info(f'before {vars_dct=}')
+            # logger.info(f'before {vars_dct=}')
             vars_new = handle_request.extract_vars(response_data=response_data, var_extract=var_extract, vars_dct=vars_dct)
-            logger.info(f'{vars_new=}')
+            # logger.info(f'{vars_new=}')
             vars_dct.update(vars_new)
-            # If you need any other special process
-            logger.info(f'extract vars after: {vars_dct=}')
+            # logger.info(f'extract vars after: {vars_dct=}')
+            # If you need any other special process -> TODO
         # step 3: json schema validate
         schema_check_result = jsonschema_validate(response_data=response_data, schema=schema, request_info=request_info)
         # step 4: status code check

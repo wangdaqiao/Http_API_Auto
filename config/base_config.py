@@ -17,6 +17,7 @@ else:
 logs_dir = os.path.join(project_root_dir, 'logs', date_hour_minute_str)
 # logger.debug(f'{logs_dir=}')
 allure_xml_dir = os.path.join(project_root_dir, 'report', f'xml_{date_hour_minute_str}')
+allure_html_dir = os.path.join(project_root_dir, 'report', f'html_{date_hour_minute_str}')
 for x in [logs_dir, allure_xml_dir]:
     if not os.path.exists(x):
         os.makedirs(x)

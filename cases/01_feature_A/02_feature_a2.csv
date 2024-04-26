@@ -1,0 +1,4 @@
+request_url,method,data_type,params,json_schema_file,status_code,payload,upload_file,var_extract,run_env,test_account,priority,page_url,remark
+/put/user,PUT,json,,_put_user_PUT_200.json,200,"{""name"": ""Firefox"", ""age"": null}",,,all,all,p0,http://127.0.0.1:5000/put/user,
+/v1/users/login,POST,json,,_v1_users_login_POST_200.json,200,"{""email"": ""admin_John""}",,,all,all,p0,,
+/v1/users/login,POST,json,,_v1_users_login_POST_200.json,200,"{""email"": ""Jordan"", ""password"": ""abcd""}",,,all,all,p2,,

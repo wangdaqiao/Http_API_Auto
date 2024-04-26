@@ -99,6 +99,16 @@ def csv_to_cases(csvfile_input, email=None) -> list:
     return data_total
 
 
+def cases_from_csv_dir(csv_dir=None, email=None):
+    csv_lst = [os.path.join(csv_dir, x) for x in os.listdir(csv_dir) if x.endswith('.csv')]
+    logger.debug(f'{csv_lst=}')
+    data_total = list()
+    for csv_file in csv_lst:
+        case_lst = csv_to_cases(csvfile_input=csv_file, email=email)
+        data_total.extend(case_lst)
+    return data_total
+
+
 if __name__ == '__main__':
     case_data_lst = csv_to_cases(csvfile_input='demo_cases.csv')
     logger.debug(f'{case_data_lst=}')

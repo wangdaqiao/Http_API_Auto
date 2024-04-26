@@ -2,6 +2,7 @@ request_url,method,data_type,params,json_schema_file,status_code,payload,upload_
 /post/form,POST,data,,_post_form_POST_200.json,200,"{""name"": ""John"", ""age"": ""19""}",,"{""name"": ""$..name""}",all,all,p0,http://127.0.0.1:5000/post/form,
 /post/form,POST,data,,_post_form_POST_200.json,200,"{""name"": ""${name}"", ""age"": ""20""}",,,all,all,p0,http://127.0.0.1:5000/post/form,
 /post/json,POST,json,,_post_json_POST_200.json,200,"{""name"": ""Tracy"", ""age"": ""25year""}",,"{""name"": ""$..name"", ""age"": ""$..age""}",all,all,p0,http://127.0.0.1:5000/post/json,
+/post/json33,POST,json,,_post_json_POST_404.json,404,"{""name"": ""${name}"", ""age"": ""${age}""}",,,all,all,p0,http://127.0.0.1:5000/post/json,
 /post/json33,POST,json,,_post_json_POST_200.json,200,"{""name"": ""${name}"", ""age"": ""${age}""}",,,all,all,p0,http://127.0.0.1:5000/post/json,
 /get/form,GET,params,"{""name"": ""${name}"", ""age"": ""9""}",_get_form_GET_200.json,200,,,,all,all,p0,http://127.0.0.1:5000/get/form,
 /get/form,GET,params,"{""name"": ""${name}"", ""age"": ""9years""}",_get_form_GET_200.json,200,,,,all,all,p0,http://127.0.0.1:5000/get/form,failed case
@@ -9,7 +10,7 @@ request_url,method,data_type,params,json_schema_file,status_code,payload,upload_
 /hello/${name},GET,params,,_hello_${name}_GET_200.json,200,,,,all,all,p0,http://127.0.0.1:5000/hello/${name},
 /only,GET,params,,_only_GET_200.json,200,,,,all,all,p0,http://127.0.0.1:5000/only,
 /only,GET,params,"{""q"": ""${name}""}",_only_GET_200.json,200,,,,all,all,p0,http://127.0.0.1:5000/only?q=hello,
-/only,GET,params,"{""q"": ""goodbye"", ""w"": ""123""}",_only_GET_200.json,200,,,,all,all,p0,http://127.0.0.1:5000/only?q=abc&w=123&q=goodbye,
+/only?q=abc&w=123&q=goodbye,GET,params,,_only_GET_200.json,200,,,,all,all,p0,http://127.0.0.1:5000/only?q=abc&w=123&q=goodbye,
 /upload,POST,file,,_upload_POST_200.json,200,,ez_test.png,,all,all,p0,http://127.0.0.1:5000/uploader,
 /post/err502,POST,json,,_post_err502_POST_502.json,502,"{""name"": ""nameFor502""}",,,all,all,p0,http://127.0.0.1:5000/post/err502,
 /post/err502,POST,json,,_post_err502_POST_502.json,"[200, 502]","{""name"": ""Joe502""}",,,all,all,p0,http://127.0.0.1:5000/post/err502,

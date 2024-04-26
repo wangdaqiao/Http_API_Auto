@@ -48,15 +48,16 @@ if __name__ == '__main__':
     logfile = os.path.join(base_config.logs_dir, f'API_{date_hour_minute_str}_summary.log')
     logger.add(logfile, level="INFO", enqueue=True)
     ts = time.time()
-    # allure_xml_dir = f'report/xml_{date_hour_minute_str}'
     allure_xml_dir = base_config.allure_xml_dir
+    allure_html_dir = base_config.allure_html_dir
     generate_environment_propertiesfile(folder=allure_xml_dir)
     logger.info(f'{allure_xml_dir=}')
     base_pytest_lst = ['-s', f'--alluredir={allure_xml_dir}', '--clean-alluredir', './cases/']
     case_extra = []
     # case_extra = ['-m', 'm1']
-    # case_extra = ['-m', 'm1', '-k', 'test_01_homepage_']
-    # case_extra = ['-m', 'm1', '-k', '_demo']
+    # case_extra = ['-m', 'm1', '-k', 'test_01_feature_a']
+    # case_extra = ['-m', 'm1', '-k', 'feature_b']
+    # case_extra = ['-m', 'm1', '-k', '_admin_']
     try:
         if case_extra:
             case_extra_lsts = [case_extra, ]
@@ -81,7 +82,6 @@ if __name__ == '__main__':
     p.join()
     te = time.time()
     report_post_handle.allure_report_send_alert(allure_xml_dir=allure_xml_dir)
-    # os.system('allure generate report/xml -o report/html --clean')
-    os.system(f'allure generate {allure_xml_dir} -o {base_config.project_root_dir}/report/html_{date_hour_minute_str}/ --clean')
+    os.system(f'allure generate {allure_xml_dir} -o {allure_html_dir} --clean')
     logger.info('spend time: {}'.format(te - ts))
     os.system(f'allure serve {allure_xml_dir}')

@@ -1,18 +1,15 @@
 # run env_name: could be [test, stage, prod]
 run_env: test
 
-
 case_pytest_lst:
     - ['-n', '2', '--dist=loadfile', '-m', 'm1']
-
 
 case_pytest_lst_another_sample:
     - ['-m', 'm1 and part1']
     - ['-m', 'm1 and part2']
 
-
 test:
-    base_url: 'https://api.test***.com'
+    base_url: 'http://127.0.0.1:5000/'
     # priority： case priority to run
     priorities: ['p0', 'p1']
     email: 'your_email@****.**'

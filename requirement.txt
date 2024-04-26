@@ -7,5 +7,6 @@ allure-pytest
 loguru
 jsonpath
 jsonschema
+genson
 pandas
 pyyaml
