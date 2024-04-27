@@ -44,28 +44,26 @@ def payload_vars_to_dct(payload_str: str = '', vars_dct: dict = {}) -> dict:
     Returns:
         dict: The dictionary obtained after replacing variables in the string.
     """
-    if payload_str:
-        if '${' in payload_str:
-            try:
-                string_text: str = Template(payload_str).substitute(vars_dct)
-                payload_dict = json.loads(string_text)
-            except json.decoder.JSONDecodeError as err:
-                logger.exception(err)
-                logger.error(f'{payload_str=}')
-                logger.error(f'{vars_dct=}')
-                logger.error(f'{string_text=}')
-                try:
-                    payload_dict = literal_eval(string_text)
-                except NameError as err:
-                    payload_dict = string_text
-                    logger.error(err)
-            finally:
-                logger.debug(f'{payload_dict=}')
-        else:
-            payload_dict = json.loads(payload_str)
-    else:
-        payload_dict = None
-    return payload_dict
+    if not payload_str:
+        return None
+    if '${' not in payload_str:
+        return json.loads(payload_str)
+    try:
+        string_text: str = Template(payload_str).safe_substitute(vars_dct)
+        payload_dict = json.loads(string_text)
+    except json.decoder.JSONDecodeError as err:
+        logger.exception(err)
+        logger.error(f'{payload_str=}')
+        logger.error(f'{vars_dct=}')
+        logger.error(f'{string_text=}')
+        try:
+            payload_dict = literal_eval(string_text)
+        except NameError as err:
+            payload_dict = string_text
+            logger.exception(err)
+    finally:
+        logger.debug(f'{payload_dict=}')
+        return payload_dict
 
 
 def preprocess_send_request(case_data, email=None, password=None, vars_dct=None):
@@ -113,6 +111,10 @@ def preprocess_send_request(case_data, email=None, password=None, vars_dct=None)
     obj = AppApiBase(url=request_url, http_method=http_method, data_type=data_type, params_dict=params_dict,
                      payload_dict=payload_dict, files=files, email=email, password=password)
     request_info: dict = obj.http_request(called_py=called_py)
+    request_info.update({'params_dct': params_dict,
+                         'payload_dct': payload_dict,
+                         }
+                        )
     '''
     request_info = {'request_url': '/post/form', 
                     'method': 'POST', 
@@ -131,7 +133,7 @@ def preprocess_send_request(case_data, email=None, password=None, vars_dct=None)
     return request_info
 
 
-def extract_vars(response_data=None, var_extract: str='', vars_dct: dict|None = None):
+def extract_vars(response_data=None, var_extract: str = '', vars_dct: dict | None = None):
     var_extract_dct = json.loads(var_extract)
     for k, v in var_extract_dct.items():
         tmp_lst = jsonpath(response_data, v)
