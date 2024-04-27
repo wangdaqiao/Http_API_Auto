@@ -108,8 +108,8 @@ def jsonschema_validate(response_data=None, schema: dict = None, request_info: d
         msg += f'\n---------------\npayload_dict: {payload_dict}'
         if payload_str:
             msg += f'\n---------------\npayload_str: {payload_str}'
-        if request_info and 'error_Http_Request' in request_info:
-            msg += f'\n---------------\nerror_Http_Request: {request_info.get("error_Http_Request")}'
+        if request_info and 'error_request' in request_info:
+            msg += f'\n---------------\nerror_request: {request_info.get("error_request")}'
         else:
             msg += f'\n---------------\nresponse_data: {response_data}'
         msg += f'\n---------------\njson_schema: {schema}'

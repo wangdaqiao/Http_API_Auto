@@ -144,7 +144,7 @@ class AppApiBase(object):
                 logger.error(f'data_type: {self.data_type}')
                 json_failed_error_msg = f'response.json() failed: {err} \nresponse text:\n{r.text}\n'
                 logger.error(f'{json_failed_error_msg=}')
-                tmp_dct['error_Http_Request'] = json_failed_error_msg
+                tmp_dct['error_request'] = json_failed_error_msg
             if status_code != 200:
                 logger.warning(f'waring: request status_code is {status_code}.')
             logger.info(f'full_url: {self.full_url}')
@@ -172,11 +172,7 @@ class AppApiBase(object):
                                          csv_row_data=request_info_dct,
                                          csv_headers=csv_headers)
             request_info_dct.update(tmp_dct)
-            request_info_dct.update({'params_dct': self.params_dict,
-                                     'payload_dct': self.payload_dict,
-                                     'response_data': response_json
-                                     }
-                                    )
+            request_info_dct['response_data'] = response_json
         except Exception as err:
             logger.error(f'{err=}')
             logger.error(f'{self.full_url=}')
@@ -187,7 +183,7 @@ class AppApiBase(object):
                            self.payload_str,
                            None,  # request_length
                            0,  # status_code
-                           err,  # response_data
+                           str(err),  # response_data
                            None,  # response_length
                            0,  # response_time
                            None  # finish_time
@@ -196,12 +192,9 @@ class AppApiBase(object):
             write_csv.record_request_csv(csvfile_path=csvfile_path,
                                          csv_row_data=request_info_dct,
                                          csv_headers=csv_headers)
-            request_info_dct['error_Http_Request'] = err
-            request_info_dct.update({'params_dct': self.params_dict,
-                                     'payload_dct': self.payload_dict,
-                                     'response_data': response_json
-                                     }
-                                    )
+            request_info_dct.update({'error_request': str(err),
+                                     'response_data': str(err)
+                                     })
         finally:
             logger.info(f'{request_info_dct=}')
             return request_info_dct
