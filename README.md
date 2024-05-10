@@ -68,6 +68,9 @@
 7. 执行 `python3 run_api_cases.py`，完成后默认会自动打开测试报告网页。 
    另外，我们可以在第一个参数中指定运行环境，例如 `python3 run_api_cases.py prod`
 
+报告会展示每个case的请求和返回数据，如果失败会注明原因，如下图所示：
+<img src="./utils/failed_case_report.png" style="zoom:75%;" />
+
 ---
 ### FAQ
 1. ***Q: 各功能模块的测试用例 `.csv` 文件和`jsonschema`文件是如何得到的？***  
