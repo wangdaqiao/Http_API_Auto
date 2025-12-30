@@ -27,8 +27,8 @@
             xhr.onload = function() {
                 if (xhr.status === 502) {
                     const errorMessage = document.getElementById('error-message');
-<!--                    errorMessage.textContent = 'Error 502: ' + xhr.responseText;-->
-                    errorMessage.textContent = 'Error: Internal Server Error 502';
+                    errorMessage.textContent = 'Error 502: ' + xhr.responseText;
+                    <!--  errorMessage.textContent = 'Error: Internal Server Error 502';-->
                 }
             };
         }

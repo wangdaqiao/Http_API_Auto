@@ -1,22 +1,25 @@
 # -*- coding: utf-8 -*-
-'''
+"""
 @Time    : 2023/8/3 12:55
 @Author  : Daqiao Wang
 @File    : app.py
-'''
+"""
 
 import time
 import datetime
 import os
-import random
-from flask import Flask, request, render_template, jsonify, flash, abort, make_response
+from flask import Flask, request, render_template, jsonify, flash, make_response
 from werkzeug.utils import secure_filename
-from werkzeug.exceptions import HTTPException
 from loguru import logger
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
-app.config['UPLOAD_FOLDER'] = 'upload/'
+
+# Use absolute path for upload folder
+upload_dir = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'upload')
+app.config['UPLOAD_FOLDER'] = upload_dir
+if not os.path.exists(upload_dir):
+    os.makedirs(upload_dir)
 
 @app.route('/')
 def home():
@@ -30,7 +33,7 @@ def index():
 def get_json():
     name = request.args.get('name')
     age = request.args.get('age')
-    if name or age :
+    if name or age:
         message = f"Welcome {name}, you are {age} years old."
         return jsonify({'message': message, 'path': request.path})
     else:
@@ -46,7 +49,7 @@ def get_form():
         dct = {"name": name, 'message': message, 'age': age,  "current_time": current_time(), 'path': request.path}
         try:
             dct['age'] = int(age)
-        except Exception as err:
+        except (ValueError, TypeError) as err:
             logger.error(f'{err=}')
         return jsonify(dct)
     else:
@@ -56,11 +59,11 @@ def get_form():
 def post_form():
     if request.method == 'POST':
         logger.info(f'{request.form=}')
-        name = request.form['name']
-        age = request.form['age']
-        message = f"Welcome {name}, you are {age} years old."
+        name = request.form.get('name')
+        age = request.form.get('age')
+        message = f'Welcome {name}, you are {age} old, path="{request.path}"'
         dct = {"name": name, "age": age, "message": message, 'path': request.path}
-        time.sleep(3)
+        time.sleep(1)
         return jsonify(dct)
     return render_template('post_form.html')
 
@@ -69,11 +72,31 @@ def post_form():
 def post_json():
     if request.method == 'POST':
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid JSON'}), 400
         logger.info(f'{data=}')
         name = data.get('name')
         age = data.get('age')
-        message = f"Welcome {name}, you are {age} old."
+        message = f'Welcome {name}, you are {age} old, path="{request.path}"'
+        time.sleep(1)
         return jsonify({'message': message, 'name': name, 'age': age, 'path': request.path})
+    return render_template('post_json.html')
+
+@app.route('/api/post/json', methods=['GET', 'POST'])
+def api_post_json():
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid JSON'}), 400
+        logger.info(f'{data=}')
+        name = data.get('name')
+        age = data.get('age')
+        message = f'Welcome {name}, you are {age} old, path="{request.path}"'
+        dct = {'data': [{"name": name, "age": age, "message": message},
+                        {"name": "Jiang", "age": 23, "message": "Welcome Jiang, you are 23 years old."},
+                        ],
+               'path': request.path}
+        return jsonify(dct)
     return render_template('post_json.html')
 
 @app.route('/only')
@@ -89,11 +112,17 @@ def login2():
 @app.route('/upload', methods=['GET', 'POST'])
 def upload():
     if request.method == 'POST':
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file part'}), 400
         f = request.files['file']
+        if f.filename == '':
+            return jsonify({'error': 'No selected file'}), 400
         logger.info(request.files)
         logger.info(f'{f=}')
-        # f.save(os.path.join(app.config['UPLOAD_FOLDER'], secure_filename(f.filename)))
-        dct = {"msg": f'file {f.filename} uploaded successfully', 'path': request.path}
+        # Save the file
+        filename = secure_filename(f.filename)
+        # f.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        dct = {"msg": f'file {filename} uploaded successfully', 'path': request.path}
         return jsonify(dct)
     else:
         return render_template('upload.html')
@@ -107,16 +136,18 @@ def hello_name(name):
 def update_user():
     if request.method == 'PUT':
         data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid JSON'}), 400
         name = data.get('name')
         age = data.get('age')
         dct = {'name': name,
                'age': age,
                'path': request.path,
                'message': f'User {name} age {age} updated successfully.'}
-        time.sleep(3)
+        time.sleep(1)
         try:
             dct['age'] = int(age)
-        except Exception as err:
+        except (ValueError, TypeError) as err:
             logger.error(f'{err=}')
         return jsonify(dct)
     else:
@@ -127,11 +158,15 @@ def update_user():
 def err_502():
     if request.method == 'POST':
         # 返回 502 错误
-        # return abort(502)
-        return jsonify({'error': 'Internal Server Error 502'}), 502
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'Invalid JSON'}), 400
+        name = data.get('name')
+        return jsonify({'name': name, 'error': f'Internal Server Error 502'}), 502
     else:
         # 返回一个简单的表单页面
         return render_template('post_json_502.html')
+
 @app.route('/v1/users/login', methods=['POST'])
 def login():
     if request.method == 'POST':
@@ -150,10 +185,10 @@ def login():
     else:
         return render_template('index.html')
 
+
 def current_time():
     cur_time = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     return cur_time
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
-    

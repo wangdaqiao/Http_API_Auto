@@ -15,8 +15,10 @@ from multiprocessing import Pool
 import pytest
 import copy
 from loguru import logger
-if len(sys.argv) == 2:
-    os.environ['run_env'] = sys.argv[1].lower()
+import argparse
+parser = argparse.ArgumentParser(description="main framework")
+parser.add_argument("-run_env", required=False, type=str, help="运行环境：test 或 prod")
+args = parser.parse_args()
 from config import base_config
 from utils import report_post_handle
 
@@ -57,14 +59,8 @@ if __name__ == '__main__':
     # case_extra = ['-m', 'm1']
     # case_extra = ['-m', 'm1', '-k', 'test_01_feature_a']
     # case_extra = ['-m', 'm1', '-k', 'feature_b']
-    # case_extra = ['-m', 'm1', '-k', '_admin_']
     try:
-        if case_extra:
-            case_extra_lsts = [case_extra, ]
-        else:
-            case_extra_lsts = base_config.case_pytest_lst
-    except NameError as err:
-        case_extra_lsts = base_config.case_pytest_lst
+        case_extra_lsts: list[list[str]] = [case_extra, ] if case_extra else base_config.case_pytest_lst
     except Exception as err:
         logger.debug(err)
         sys.exit()

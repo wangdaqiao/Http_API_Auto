@@ -143,40 +143,27 @@ class Follower:
             logger.error(err)
             logger.error(response_text)
         # save api data to csv
-        headers = ['request_url',
-                   'host',
-                   'status_code',
-                   'method',
-                   'data_type',
-                   'params',
-                   'payload',
-                   'payload_length',
-                   'upload_file',
-                   'response_text',
-                   'response_length',
-                   'response_duration_time',
-                   'finish_time'
-                   ]
-        api_content = [request_url,
-                       flow.request.host,
-                       status_code,
-                       method,
-                       data_type,
-                       params_str,
-                       payload_str,
-                       payload_length,
-                       upload_filename,
-                       response_text,
-                       response_length,
-                       response_duration_time,
-                       finish_time
-                       ]
+        api_content_dct = {'request_url': request_url,
+                   'host': flow.request.host,
+                   'status_code': status_code,
+                   'method': method,
+                   'data_type': data_type,
+                   'params': params_str,
+                   'payload': payload_str,
+                   'payload_length': payload_length,
+                   'upload_file': upload_filename,
+                   'response_text': response_text,
+                   'response_length': response_length,
+                   'response_duration_time': response_duration_time,
+                   'finish_time':finish_time
+                   }
+        headers = api_content_dct.keys()
         logger.debug(f'will log: {request_url} {method} {response_duration_time=}')
         with open(self.log_file, "a", encoding='utf-8', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=headers)
             if csvfile.tell() == 0:
                 writer.writeheader()
-            writer.writerow(dict(zip(headers, api_content)))
+            writer.writerow(api_content_dct)
 
 
 addons = [

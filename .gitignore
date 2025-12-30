@@ -178,3 +178,4 @@ celerybeat.pid
 
 # Cython debug symbols
 cython_debug/
+/just4testonly/
