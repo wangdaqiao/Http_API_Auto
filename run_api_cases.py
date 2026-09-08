@@ -28,14 +28,14 @@ def generate_environment_propertiesfile(folder=None):
     generate environment.properties file to report folder
     :return:
     """
-    enviroment_info = f'The_Server = {base_config.base_url}'
-    enviroment_info += f'\nTest_account = {base_config.email}'
-    enviroment_info += f'\nHostname = {socket.gethostname()}'
-    # enviroment_info += f'\nPython_Version = 3.10'
-    # enviroment_info += f'\nallure_Version = 2.17'
+    environment_info = f'The_Server = {base_config.base_url}'
+    environment_info += f'\nTest_account = {base_config.email}'
+    environment_info += f'\nHostname = {socket.gethostname()}'
+    # environment_info += f'\nPython_Version = 3.10'
+    # environment_info += f'\nallure_Version = 2.17'
     file_path = os.path.join(folder, 'environment.properties')
     with open(file_path, 'w') as fw:
-        fw.write(enviroment_info)
+        fw.write(environment_info)
 
 
 def run_case_part(pytest_lst):
