@@ -118,9 +118,19 @@ def jsonschema_validate(response_data=None, schema: dict = None, request_info: d
             msg += f'\n---------------\nfinish_time: {request_info.get("finish_time")}'
         # logger.debug(f'{msg=}')
         if check_result:
-            allure.attach(f"{msg}", "jsonschema validate success msg")
+            allure.attach(
+                body=f"{msg}",
+                name="jsonschema validate success msg",
+                attachment_type=allure.attachment_type.TEXT,
+                extension="txt",
+            )
         else:
-            allure.attach(f"{msg}", "jsonschema validate failure msg")
+            allure.attach(
+                body=f"{msg}",
+                name="jsonschema validate failure msg",
+                attachment_type=allure.attachment_type.TEXT,
+                extension="txt",
+            )
         return check_result
 
 
