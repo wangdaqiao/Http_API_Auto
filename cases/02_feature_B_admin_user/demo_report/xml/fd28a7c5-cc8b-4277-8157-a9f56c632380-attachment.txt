@@ -1,0 +1,23 @@
+Success!
+---------------
+request_url: /put/user
+---------------
+method: PUT
+---------------
+data_type: json
+---------------
+status_code: 200
+---------------
+params_dict: None
+---------------
+payload_dict: {'name': 'Firefox02', 'age': '7'}
+---------------
+payload_str: {"name": "Firefox02", "age": "7"}
+---------------
+response_data: {'age': 7, 'message': 'User Firefox02 age 7 updated successfully.', 'name': 'Firefox02', 'path': '/put/user'}
+---------------
+json_schema: {'type': 'object', 'properties': {'name': {'type': 'string'}, 'age': {'anyOf': [{'type': 'integer'}, {'type': 'string'}, {'type': 'null'}]}, 'path': {'type': 'string'}, 'message': {'type': 'string'}}, 'required': ['name', 'age', 'path', 'message'], 'additionalProperties': False}
+---------------
+response_time: 1.03322
+---------------
+finish_time: 20260908-14:27:13

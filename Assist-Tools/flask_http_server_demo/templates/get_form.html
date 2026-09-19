@@ -12,7 +12,7 @@
             params.append('name', name);
             params.append('age', age);
 
-            const url = `/get/form?${params.toString()}`;
+            const url = `/v1/get/form?${params.toString()}`;
             const xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');

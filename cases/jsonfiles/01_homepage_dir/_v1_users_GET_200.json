@@ -1,0 +1,59 @@
+{
+    "type": "object",
+    "properties": {
+        "data": {
+            "type": "object",
+            "properties": {
+                "user_id": {
+                    "type": "string"
+                },
+                "firstname": {
+                    "type": "string"
+                },
+                "lastname": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "is_verified": {
+                    "type": "boolean"
+                },
+                "user_create_date": {
+                    "type": "string"
+                },
+                "current_plan": {
+                    "type": "string"
+                },
+                "isPasswordEmpty": {
+                    "type": "boolean"
+                },
+                "social_media_source": {
+                    "type": "string"
+                }
+            },
+            "required": [
+                "current_employer",
+                "current_plan",
+                "current_title",
+                "email",
+                "firstname",
+                "image_url",
+                "isInfluencer",
+                "isPasswordEmpty",
+                "is_verified",
+                "lastname",
+                "location",
+                "phone_number",
+                "social_media_source",
+                "subscription_info",
+                "user_create_date",
+                "user_id",
+                "user_timezone"
+            ]
+        }
+    },
+    "required": [
+        "data"
+    ]
+}

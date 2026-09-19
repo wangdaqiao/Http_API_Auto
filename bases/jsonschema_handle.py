@@ -49,21 +49,30 @@ def schema_from_jsonfile(json_schema_file_name) -> dict:
         json_schema_file_name (str): The name of the JSON schema file.
 
     Returns:
-        dict: The loaded schema if the file exists and can be loaded, None otherwise.
+        dict: The loaded schema.
+
+    Raises:
+        FileNotFoundError: if the schema file is not found under the json_schema_files_dir.
+        ValueError: if the schema file exists but can not be loaded as valid JSON.
     """
     json_schema_file_fullpath = file_from_dir(json_schema_files_dir, json_schema_file_name)
     logger.debug(f'{json_schema_file_fullpath=}')
     if not json_schema_file_fullpath:
+        err_msg = (f'{json_schema_file_name} is not found under {json_schema_files_dir}. '
+                   f'Please make sure the json_schema_file column of the CSV case points to an existing file. '
+                   f'If no json schema validation is expected, leave the json_schema_file cell empty.')
         logger.error(f'{json_schema_file_name} file is not exists')
-        return {}
+        # raise FileNotFoundError(err_msg)
+        return
     try:
         with open(json_schema_file_fullpath, encoding='utf-8') as fr:
             schema = json.load(fr)
-    except Exception as err:
-        logger.error(err)
-        schema = {}
-    finally:
-        return schema
+    except json.JSONDecodeError as err:
+        err_msg = f'Invalid JSON schema file {json_schema_file_fullpath}: {err}'
+        logger.error(err_msg)
+        # raise ValueError(err_msg)
+        return
+    return schema
 
 
 def jsonschema_validate(response_data=None, schema: dict = None, request_info: dict = None) -> bool:
@@ -135,7 +144,7 @@ def jsonschema_validate(response_data=None, schema: dict = None, request_info: d
 
 
 if __name__ == '__main__':
-    # schema: dict = schema_from_jsonfile('_get_form_GET_200.json')
+    # schema: dict = schema_from_jsonfile('_v1_get_form_GET_200.json')
     # pprint(schema)
     data_main = {}
     schema = {}

@@ -178,4 +178,8 @@ celerybeat.pid
 
 # Cython debug symbols
 cython_debug/
-/just4testonly/
+just4testonly/
+
+# 环境敏感的 yaml（含 config/*.yaml 的实际配置）默认不入库，
+# 但保留 config/config_sample.yaml 作为新人可参考的示例模板提交。
+!config/config_sample.yaml

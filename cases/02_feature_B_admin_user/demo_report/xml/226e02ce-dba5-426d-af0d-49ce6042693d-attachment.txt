@@ -1,0 +1,23 @@
+Success!
+---------------
+request_url: /post/form
+---------------
+method: POST
+---------------
+data_type: data
+---------------
+status_code: 200
+---------------
+params_dict: None
+---------------
+payload_dict: {'name': 'TJD', 'age': '30'}
+---------------
+payload_str: {"name": "TJD", "age": "30"}
+---------------
+response_data: {'age': '30', 'message': 'Welcome TJD, you are 30 old, path="/post/form"', 'name': 'TJD', 'path': '/post/form'}
+---------------
+json_schema: {'type': 'object', 'properties': {'age': {'type': 'string'}, 'name': {'type': 'string'}}, 'required': ['age', 'name']}
+---------------
+response_time: 1.019671
+---------------
+finish_time: 20260908-14:27:15

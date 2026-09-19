@@ -12,7 +12,7 @@
                 age: age
             };
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/post/json', true);
+            xhr.open('POST', '/v1/post/json', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.onreadystatechange = function() {
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

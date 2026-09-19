@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "properties": {
+        "email": {
+            "type": "string"
+        },
+        "message": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        },
+        "role": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "email",
+        "message",
+        "path",
+        "role"
+    ]
+}

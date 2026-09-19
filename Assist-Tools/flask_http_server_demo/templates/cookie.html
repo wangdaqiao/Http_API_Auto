@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>Cookie 演示</title>
+    <style>
+        body { font-family: sans-serif; max-width: 720px; margin: 40px auto; }
+        input { padding: 6px; margin-right: 8px; }
+        button { cursor: pointer; }
+        table { border-collapse: collapse; margin-top: 10px; width: 100%; }
+        td, th { border: 1px solid #ccc; padding: 8px; text-align: left; }
+        .resp-box {
+            background: #f6f8fa; border: 1px solid #ddd; border-radius: 6px;
+            padding: 10px; font-size: 13px; white-space: pre-wrap;
+            word-break: break-all; max-height: 260px; overflow: auto;
+        }
+        .resp-ok { color: #1a7f37; }
+        .resp-err { color: #cf222e; }
+        #formMsg { display: none; margin: 8px 0; }
+        .clear { margin-top: 10px; }
+        .muted { color: #666; }
+    </style>
+</head>
+<body>
+    <h2>Cookie 演示</h2>
+    <p class="muted">页面与接口合并于 <code>/v1/cookie</code>：浏览器访问显示本页，接口请求（<code>Accept: application/json</code>）返回 JSON；写入为 <code>POST /v1/cookie</code>（支持 <code>application/json</code> / 表单两种请求体），清除为 <code>POST /v1/clear_cookie</code>。仅写入指定 key，不额外写入元 Cookie，请求头里只有演示写入的 key=value</p>
+
+    <h3>写入 Cookie</h3>
+    <form id="cookieForm" method="post">
+        <input id="key" name="key" placeholder="key" required>
+        <input id="value" name="value" placeholder="value" required>
+        <button type="submit">写入 Cookie</button>
+    </form>
+    <p id="formMsg"></p>
+
+    <h3>接口响应（JSON）</h3>
+    <pre id="respBox" class="resp-box">（页面加载后将请求 GET /v1/cookie，并在此展示返回的 JSON）</pre>
+
+    <h3>浏览器当前携带的 Cookie</h3>
+    <div id="cookieArea">加载中…</div>
+    <button id="clearBtn" class="clear" type="button">清除本站点全部 Cookie</button>
+
+    <script>
+        const cookieArea = document.getElementById('cookieArea');
+        const respBox = document.getElementById('respBox');
+        const formMsg = document.getElementById('formMsg');
+
+        function setMsg(text, isError) {
+            formMsg.textContent = text || '';
+            formMsg.className = isError ? 'resp-err' : 'resp-ok';
+            formMsg.style.display = text ? 'block' : 'none';
+        }
+
+        // 展示一次接口返回的 JSON（含提示消息）
+        function showResponse(data, isError) {
+            respBox.textContent = JSON.stringify(data, null, 4);
+            setMsg(data && data.message ? data.message : '', isError);
+            if (data && data.cookies) {
+                renderCookieArea(data.cookies);
+            }
+        }
+
+        // 根据 cookies 对象重建 Cookie 列表
+        function renderCookieArea(cookies) {
+            cookieArea.textContent = '';
+            const keys = Object.keys(cookies || {});
+            if (keys.length === 0) {
+                const p = document.createElement('p');
+                p.textContent = '暂无 Cookie';
+                p.className = 'muted';
+                cookieArea.appendChild(p);
+                return;
+            }
+            const table = document.createElement('table');
+            const head = document.createElement('tr');
+            ['Key', 'Value'].forEach(text => {
+                const th = document.createElement('th');
+                th.textContent = text;
+                head.appendChild(th);
+            });
+            table.appendChild(head);
+            keys.forEach(k => {
+                const tr = document.createElement('tr');
+                const td1 = document.createElement('td');
+                td1.textContent = k;
+                const td2 = document.createElement('td');
+                td2.textContent = cookies[k];
+                tr.appendChild(td1);
+                tr.appendChild(td2);
+                table.appendChild(tr);
+            });
+            cookieArea.appendChild(table);
+        }
+
+        async function requestJSON(path, options) {
+            const res = await fetch(path, options);
+            const data = await res.json();
+            return { res, data };
+        }
+
+        // 1) 页面加载：GET /v1/cookie 拉取当前 Cookie 并展示
+        async function loadCookies() {
+            try {
+                const { res, data } = await requestJSON('/v1/cookie', {
+                    headers: { 'Accept': 'application/json' }
+                });
+                showResponse(data, !res.ok);
+            } catch (err) {
+                respBox.textContent = '请求 /v1/cookie 失败: ' + err;
+                setMsg('加载失败', true);
+            }
+        }
+
+        // 2) 写入 Cookie：POST /v1/cookie
+        document.getElementById('cookieForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+            const form = e.target;
+            setMsg('');
+            try {
+                const { res, data } = await requestJSON(form.action || '/v1/cookie', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(new FormData(form)))
+                });
+                showResponse(data, !data.ok);
+                if (data && data.ok) {
+                    document.getElementById('key').value = '';
+                    document.getElementById('value').value = '';
+                }
+            } catch (err) {
+                respBox.textContent = '写入失败: ' + err;
+                setMsg('请求失败', true);
+            }
+        });
+
+        // 3) 清除 Cookie：POST /v1/clear_cookie
+        document.getElementById('clearBtn').addEventListener('click', async function () {
+            if (!confirm('确定清除本站点全部 Cookie 吗？')) return;
+            setMsg('');
+            try {
+                const { res, data } = await requestJSON('/v1/clear_cookie', {
+                    method: 'POST',
+                    headers: { 'Accept': 'application/json' }
+                });
+                showResponse(data, !data.ok);
+            } catch (err) {
+                respBox.textContent = '清除失败: ' + err;
+                setMsg('请求失败', true);
+            }
+        });
+
+        loadCookies();
+    </script>
+</body>
+</html>

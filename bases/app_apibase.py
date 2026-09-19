@@ -103,7 +103,7 @@ class AppApiBase(object):
                              'payload',
                              'request_length',
                              'status_code',
-                             'response_str',
+                             'response_text',
                              'response_length',
                              'response_time',
                              'finish_time']
@@ -155,7 +155,7 @@ class AppApiBase(object):
             logger.info(f'status_code: {r.status_code}')
             logger.info(f'{response_json=}')
             logger.info(f'{response_time=}')
-            response_str = json.dumps(response_json, ensure_ascii=False)
+            response_text = json.dumps(response_json, ensure_ascii=False)
             api_content = [self.request_url,
                            self.http_method.upper(),
                            self.data_type,
@@ -163,7 +163,7 @@ class AppApiBase(object):
                            self.payload_str,
                            self.request_length,
                            status_code,
-                           response_str,
+                           response_text,
                            response_length,
                            response_time,
                            finish_time]

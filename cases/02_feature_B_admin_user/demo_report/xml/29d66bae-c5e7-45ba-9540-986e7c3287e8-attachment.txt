@@ -1,0 +1,23 @@
+Success!
+---------------
+request_url: /post/err502
+---------------
+method: POST
+---------------
+data_type: json
+---------------
+status_code: 502
+---------------
+params_dict: None
+---------------
+payload_dict: {'name': 'For502'}
+---------------
+payload_str: {"name": "For502"}
+---------------
+response_data: {'error': 'Internal Server Error 502', 'name': 'For502'}
+---------------
+json_schema: {'type': 'object', 'properties': {'msg': {'type': 'string', 'pattern': 'Internal Server Error 502'}}, 'required': ['error']}
+---------------
+response_time: 0.003029
+---------------
+finish_time: 20260908-14:27:13

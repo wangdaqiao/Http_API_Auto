@@ -169,7 +169,7 @@ def allure_report_send_alert(allure_xml_dir=None, csv_rootdir=None):
         else:
             logger.debug('All api status code is 200, and response time is less than 3s.')
     logger.info(f'{msg_text=}')
-    # Send alert messages if necessary (via slack, Dingding, email, etc.)
+    # Send alert messages if necessary (via Slack, Dingding, Feishu, email, etc.)
 
 
 

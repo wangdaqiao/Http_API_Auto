@@ -18,6 +18,37 @@ project_root_dir = os.path.dirname(cur_dir)
 sys.path.append(project_root_dir)
 from config import base_config
 
+_registered_logfile_handlers: dict[str, int] = {}
+
+
+def add_file_logger(logfile: str, level: str = 'INFO', enqueue: bool = True) -> int:
+    """
+    Add a loguru file handler that writes to ``logfile``, without touching any
+    other handler of the current process.
+
+    The test modules used to call ``logger.remove()`` before ``logger.add(...)``.
+    ``logger.remove()`` removes ALL loguru handlers of the process -- including
+    the summary logger registered by ``run_api_cases.py`` in the main process,
+    and file handlers added by other test modules -- which silently breaks the
+    main summary log as soon as the first test module runs in-process.
+
+    This helper:
+    * never calls ``logger.remove()`` (handlers of other callers stay intact);
+    * registers at most one handler per logfile per process (idempotent), so
+      collecting the same module more than once does not duplicate log lines.
+
+    Returns:
+        int: the loguru handler id (for later use with logger.remove(handler_id)).
+    """
+    normalized_logfile = os.path.normcase(os.path.abspath(logfile))
+    registered_handler_id = _registered_logfile_handlers.get(normalized_logfile)
+    if registered_handler_id is not None:
+        return registered_handler_id
+    handler_id = logger.add(logfile, level=level, enqueue=enqueue)
+    _registered_logfile_handlers[normalized_logfile] = handler_id
+    logger.debug(f'loguru file handler added: {logfile} (handler_id={handler_id})')
+    return handler_id
+
 
 def get_host_ip():
     """
@@ -33,7 +64,15 @@ def get_host_ip():
 
 
 def case_ids_define(data_total):
-    case_ids = ['-'.join([x['request_url'], x['http_method']]) for x in data_total]
+    """
+    Build a unique pytest case id for every CSV row.
+
+    The 1-based index is prepended on purpose: several rows in the same CSV may share the
+    same request_url & http_method (e.g. the same endpoint demoed with different payloads),
+    and duplicated ids make logs / allure reports unable to distinguish those cases.
+    """
+    case_ids = ['-'.join([str(index), x['request_url'], x['http_method']])
+                for index, x in enumerate(data_total, start=1)]
     return case_ids
 
 

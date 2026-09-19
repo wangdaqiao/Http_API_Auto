@@ -1,0 +1,23 @@
+Success!
+---------------
+request_url: /post/form
+---------------
+method: POST
+---------------
+data_type: data
+---------------
+status_code: 200
+---------------
+params_dict: None
+---------------
+payload_dict: {'name': '中国', 'heloo': False, 'age': '19'}
+---------------
+payload_str: {"name": "中国", "heloo": false, "age": "19"}
+---------------
+response_data: {'age': '19', 'message': 'Welcome 中国, you are 19 old, path="/post/form"', 'name': '中国', 'path': '/post/form'}
+---------------
+json_schema: {'type': 'object', 'properties': {'age': {'type': 'string'}, 'name': {'type': 'string'}}, 'required': ['age', 'name']}
+---------------
+response_time: 1.019651
+---------------
+finish_time: 20260908-14:27:12

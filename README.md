@@ -47,8 +47,8 @@
 - 保存脚本生成的日志
 - http接口请求数据记录（csv格式）
 
-- ### reports
-- 保存 Allure 生成的测试报告
+- ### report
+- 保存 Allure 生成的测试报告（实际目录为 `report/`）
 
 ### utils
 - [csv_parse.py](utils/csv_parse.py)：将.csv转换为测试用例
@@ -66,7 +66,7 @@
 5. 参考“config”子文件夹中的`config_sample.yaml`生成`config.yaml`文件，并进行配置。 
 6. 如果是想体验下效果，可先进入 [flask demo](Assist-Tools/flask_http_server_demo) 目录，执行 `python app.py` 命令在本地启动一个http测试服务端，否则请忽略。 
 7. 执行 `python3 run_api_cases.py`，完成后默认会自动打开测试报告网页。 
-   另外，我们可以在第一个参数中指定运行环境，例如 `python3 run_api_cases.py prod`
+   另外，可以通过位置参数或 `-run_env` 指定运行环境，例如 `python3 run_api_cases.py prod` 或 `python3 run_api_cases.py -run_env prod`（两者等价，都会被写入 `run_env` 环境变量后再加载 config）。
 
 报告会展示每个case的请求和返回数据，如果失败会注明原因，如下图所示：
 <img src="./utils/failed_case_report.png" style="zoom:75%;" />

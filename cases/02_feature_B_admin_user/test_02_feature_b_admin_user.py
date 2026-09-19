@@ -11,8 +11,6 @@ import os
 import sys
 import time
 import pytest
-import json
-from jsonpath import jsonpath
 from loguru import logger
 cur_dir = os.path.dirname(__file__)
 project_root_dir = os.path.dirname(os.path.dirname(cur_dir))
@@ -37,8 +35,9 @@ vars_dct = {}
 
 def setup_module():
     vars_dct['t1'] = time.time()
-    logger.remove()
-    logger.add(logfile, level="INFO", enqueue=True)
+    # 只挂本模块的日志文件 handler，绝不 logger.remove()，
+    # 否则会清掉主进程 run_api_cases.py 注册的 summary 日志及其它模块的 handler
+    common_funs.add_file_logger(logfile)
     logger.info(f'{cases_total=}')
     logger.info('setup_module starts.')
     logger.debug(f'case number: {len(cases_total)}')
@@ -63,7 +62,8 @@ class TestSuite_01_FeatureB_Admin_User(object):
         logger.info(f'{func_name} begin. {case_data=}')
         # step 1: send http request
         json_schema_file: str = case_data.get('json_schema_file')
-        schema: dict = schema_from_jsonfile(json_schema_file)
+        # 仅当 json_schema_file 非空时才加载并校验 json schema；
+        schema: dict | None = schema_from_jsonfile(json_schema_file) if json_schema_file else None
         status_code_expect_lst = case_data.get('status_code')
         var_extract: str = case_data.get('var_extract')
         logger.debug(f'extract vars before {vars_dct=}')
@@ -75,16 +75,24 @@ class TestSuite_01_FeatureB_Admin_User(object):
         # step 2: extract variables
         if var_extract:
             logger.info(f'before {vars_dct=}')
-            vars_new = handle_request.extract_vars(response_data=response_data, var_extract=var_extract, vars_dct=vars_dct)
-            logger.info(f'{vars_new=}')
-            vars_dct.update(vars_new)
+            # extract_vars 原地写入 vars_dct（返回值就是 vars_dct 本身），无需再 update 一次
+            handle_request.extract_vars(response_data=response_data, var_extract=var_extract, vars_dct=vars_dct)
             logger.info(f'after {vars_dct=}')
             # If you need any other special process
             logger.info(f'extract vars after: {vars_dct=}')
         # step 3: json schema validate
-        jsonschema_validate(response_data=response_data, schema=schema, request_info=request_info)
+        schema_check_result = True
+        if schema is not None:
+            schema_check_result = jsonschema_validate(response_data=response_data, schema=schema, request_info=request_info)
         # step 4: status code check
-        assert request_info.get('status_code') in status_code_expect_lst
+        assert request_info.get('status_code') in status_code_expect_lst, (
+            f"status code is {request_info.get('status_code')}, it should be in {status_code_expect_lst}, "
+            f"url: {case_data.get('request_url')}"
+        )
+        assert schema_check_result, (
+            f'response data does not match json schema, url: {case_data.get("request_url")}, '
+            f'json_schema_file: {json_schema_file}'
+        )
         # assert request_info.get('response_time') <= 10.0
         time.sleep(0.1)
         logger.debug('*' * 10)
