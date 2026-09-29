@@ -1,8 +1,22 @@
-<!DOCTYPE html>
-<html lang="zh-cn">
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome</title>
+{% extends 'base.html' %}
+
+{% block title %}Welcome -- Post Form{% endblock %}
+
+{% block body %}
+    <h1>Welcome Post Form</h1>
+    <label>
+        Name:
+        <input type="text" id="name">
+    </label>
+    <br><br>
+    <label>
+        Age:
+        <input type="number" id="age">
+    </label>
+    <br><br>
+    <button onclick="submitForm()">Submit</button>
+    <p id="message"></p>
+
     <script>
         function submitForm() {
             const name = document.getElementById('name').value;
@@ -11,30 +25,27 @@
             xhr.open('POST', '/v1/post/form', true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    document.getElementById('message').textContent = response.message;
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    const messageEl = document.getElementById('message');
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        messageEl.textContent = response.message;
+                        messageEl.style.color = '#1a7f37';
+                    } else {
+                        let errText = xhr.responseText;
+                        try {
+                            const errJson = JSON.parse(xhr.responseText);
+                            errText = errJson.error || errJson.message || errText;
+                        } catch (e) {}
+                        messageEl.textContent = errText;
+                        messageEl.style.color = '#cf222e';
+                    }
                 }
             };
-            xhr.send(`name=${name}&age=${age}`);
+            const params = new URLSearchParams();
+            params.append('name', name);
+            params.append('age', age);
+            xhr.send(params.toString());
         }
     </script>
-</head>
-<body>
-    <h1>Welcome Post Form</h1>
-    <label>
-        Name:
-        <input type="text" id="name">
-    </label>
-    <br>
-    <br>
-    <label>
-        Age:
-        <input type="number" id="age">
-    </label>
-    <br>
-    <br>
-    <button onclick="submitForm()">Submit</button>
-    <p id="message"></p>
-</body>
-</html>
+{% endblock %}

@@ -1,0 +1,76 @@
+<style>
+    .user-status {
+        margin: 16px 0 24px;
+        padding: 12px 16px;
+        background: #f6f8fa;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        color: #24292f;
+    }
+    .user-status .auth-action {
+        display: block;
+        width: fit-content;
+        margin-top: 10px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        background: #0969da;
+        color: #fff;
+        font-size: 14px;
+        text-decoration: none;
+    }
+    .user-status .auth-action:hover { background: #0550ae; }
+    .user-status .logout-action { background: #cf222e; }
+    .user-status .logout-action:hover { background: #a40e26; }
+</style>
+<p id="userStatus" class="user-status">正在获取登录状态...</p>
+<script>
+    async function loadUserStatus() {
+        const userStatus = document.getElementById('userStatus');
+        try {
+            const response = await fetch('/v1/userInfo');
+            const data = await response.json();
+            if (response.status !== 401 && !response.ok) {
+                throw new Error(data.message || data.error || '获取用户信息失败');
+            }
+            if (response.status === 401 || !data.logged_in) {
+                userStatus.textContent = data.message || '当前未登录';
+                const loginLink = document.createElement('a');
+                loginLink.href = '/users/login';
+                loginLink.textContent = '登录';
+                loginLink.className = 'auth-action';
+                userStatus.appendChild(loginLink);
+                return;
+            }
+            userStatus.textContent = '当前已登录用户：' + data.username;
+            const logoutLink = document.createElement('a');
+            logoutLink.href = '/v1/logout';
+            logoutLink.textContent = '退出登录';
+            logoutLink.className = 'auth-action logout-action';
+            logoutLink.addEventListener('click', async function (event) {
+                event.preventDefault();
+                try {
+                    const logoutResponse = await fetch('/v1/logout', {method: 'POST'});
+                    if (!logoutResponse.ok) {
+                        throw new Error('退出登录失败');
+                    }
+                    window.location.reload();
+                } catch (error) {
+                    let errSpan = document.getElementById('logoutError');
+                    if (!errSpan) {
+                        errSpan = document.createElement('span');
+                        errSpan.id = 'logoutError';
+                        errSpan.style.color = '#cf222e';
+                        errSpan.style.marginLeft = '12px';
+                        userStatus.appendChild(errSpan);
+                    }
+                    errSpan.textContent = error.message;
+                }
+            });
+            userStatus.appendChild(logoutLink);
+        } catch (error) {
+            userStatus.textContent = error.message;
+        }
+    }
+
+    loadUserStatus();
+</script>

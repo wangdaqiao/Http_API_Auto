@@ -1,0 +1,16 @@
+{
+    "type": "object",
+    "properties": {
+        "error": {
+            "type": "string",
+            "pattern":"Invalid username or password"
+        },
+        "path": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "error",
+        "path"
+    ]
+}

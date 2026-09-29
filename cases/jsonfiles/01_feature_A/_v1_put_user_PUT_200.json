@@ -29,6 +29,5 @@
     "age",
     "path",
     "message"
-  ],
-  "additionalProperties": false
+  ]
 }

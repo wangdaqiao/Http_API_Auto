@@ -1,32 +1,33 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
-<head>
-    <meta charset="UTF-8">
-    <title>Cookie 演示</title>
-    <style>
-        body { font-family: sans-serif; max-width: 720px; margin: 40px auto; }
-        input { padding: 6px; margin-right: 8px; }
-        button { cursor: pointer; }
-        table { border-collapse: collapse; margin-top: 10px; width: 100%; }
-        td, th { border: 1px solid #ccc; padding: 8px; text-align: left; }
-        .resp-box {
-            background: #f6f8fa; border: 1px solid #ddd; border-radius: 6px;
-            padding: 10px; font-size: 13px; white-space: pre-wrap;
-            word-break: break-all; max-height: 260px; overflow: auto;
-        }
-        .resp-ok { color: #1a7f37; }
-        .resp-err { color: #cf222e; }
-        #formMsg { display: none; margin: 8px 0; }
-        .clear { margin-top: 10px; }
-        .muted { color: #666; }
-    </style>
-</head>
-<body>
+{% extends 'base.html' %}
+
+{% block title %}Cookie 演示{% endblock %}
+
+{% block head %}
+<style>
+    body { font-family: sans-serif; max-width: 720px; margin: 40px auto; }
+    input { padding: 6px; margin-right: 8px; }
+    button { cursor: pointer; }
+    table { border-collapse: collapse; margin-top: 10px; width: 100%; }
+    td, th { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    .resp-box {
+        background: #f6f8fa; border: 1px solid #ddd; border-radius: 6px;
+        padding: 10px; font-size: 13px; white-space: pre-wrap;
+        word-break: break-all; max-height: 260px; overflow: auto;
+    }
+    .resp-ok { color: #1a7f37; }
+    .resp-err { color: #cf222e; }
+    #formMsg { display: none; margin: 8px 0; }
+    .clear { margin-top: 10px; }
+    .muted { color: #666; }
+</style>
+{% endblock %}
+
+{% block body %}
     <h2>Cookie 演示</h2>
     <p class="muted">页面与接口合并于 <code>/v1/cookie</code>：浏览器访问显示本页，接口请求（<code>Accept: application/json</code>）返回 JSON；写入为 <code>POST /v1/cookie</code>（支持 <code>application/json</code> / 表单两种请求体），清除为 <code>POST /v1/clear_cookie</code>。仅写入指定 key，不额外写入元 Cookie，请求头里只有演示写入的 key=value</p>
 
     <h3>写入 Cookie</h3>
-    <form id="cookieForm" method="post">
+    <form id="cookieForm" method="post" action="/v1/cookie">
         <input id="key" name="key" placeholder="key" required>
         <input id="value" name="value" placeholder="value" required>
         <button type="submit">写入 Cookie</button>
@@ -154,5 +155,4 @@
 
         loadCookies();
     </script>
-</body>
-</html>
+{% endblock %}

@@ -4,6 +4,7 @@
 import os
 import sys
 import json
+import threading
 from urllib.parse import urljoin
 import datetime
 import requests
@@ -22,6 +23,10 @@ except OverflowError:
     csv.field_size_limit(2147483647)
 
 session_dct = dict()
+# 保护 session_dct 写入的互斥锁：pytest-xdist --dist=loadfile 模式下，同一进程内
+# 多个线程可能同时发现 session_dct[username] 为 None，并发调用 login_session()，
+# 造成双重登录和 session 覆盖。加锁确保同一用户只登录一次。
+_session_lock = threading.Lock()
 
 
 class AppApiBase(object):
@@ -29,22 +34,26 @@ class AppApiBase(object):
     OurApp Api Base
     """
     def __init__(self, url='', params_dict=None, payload_dict=None, http_method='get', data_type=None, files=None,
-                 email=None, password=None, need_login=False):
+                 username=None, password=None, need_login=False):
         self.request_url = url
         if url.lower().startswith(r'http://') or url.lower().startswith(r'https://'):
             self.full_url = url
         else:
             self.full_url = urljoin(base_config.base_url, url)
-        self.email = email if email else base_config.email
+        self.username = username if username else base_config.username
         self.password = password if password else base_config.password
         self.need_login = need_login if need_login else base_config.need_login
         self.headers = {'Content-Type': 'application/json', 'charset': 'UTF-8'}
-        # logger.info(f'{self.email=}  {self.password=}')
-        if not session_dct.get(self.email):
-            logger.debug(f'class session for {self.email} is None')
-            session_dct[self.email] = self.login_session(email=self.email, password=self.password)
-        else:
-            logger.debug(f'class session for {self.email} exists already')
+        # logger.info(f'{self.username=}  {self.password=}')
+        # 用锁保护"检查-登录-写入"三步，防止多线程并发时同一用户被重复登录：
+        # 线程 A 和线程 B 同时发现 session_dct[username] 为 None，若无锁，
+        # 两者都会调用 login_session()，后者的 session 会覆盖前者，造成 session 错乱。
+        with _session_lock:
+            if not session_dct.get(self.username):
+                logger.debug(f'class session for {self.username} is None')
+                session_dct[self.username] = self.login_session(username=self.username, password=self.password)
+            else:
+                logger.debug(f'class session for {self.username} exists already')
         self.params_dict = params_dict
         self.payload_dict = payload_dict
         self.params_str = json.dumps(params_dict, ensure_ascii=False) if params_dict else None
@@ -65,30 +74,33 @@ class AppApiBase(object):
         self.files = files
 
     # @staticmethod
-    def login_session(self, email=None, password=None):
+    def login_session(self, username=None, password=None):
         """
         create a login requests session for a user.
         """
         # login_url_full = "https://api.testxxx.com/v1/users/login"
         login_url_full = urljoin(base_config.base_url, '/v1/users/login')
-        payload = {"email": email, "password": password}
+        payload = {"username": username, "password": password}
         logger.debug(f'login {login_url_full=} {payload=}')
         session = requests.session()
         if not self.need_login:
             return session
         # TODO:  Please Improve the login section, usually need to update headers as required
-        return session
-        '''
         response = session.request("POST", login_url_full, json=payload, headers=self.headers, verify=False)
         cookies = response.cookies.get_dict()
         if cookies:
-            session.headers.update({'csrf-token': cookies['csrfToken']})
+            session.headers.update({'csrf-token': cookies['session']})
             return session
         else:
             logger.warning(f'response of /v1/users/login: {response}')
             logger.warning('failed to login, quit now')
-            sys.exit()
-        '''
+            # sys.exit()
+            logger.error(f'response of /v1/users/login: {response}')
+            raise RuntimeError(
+                f'Login failed for user "{username}": '
+                f'no cookie returned from {login_url_full}. '
+                f'HTTP status={response.status_code}, body={response.text[:200]}'
+            )
 
     def http_request(self, called_py=None):
         """
@@ -117,17 +129,22 @@ class AppApiBase(object):
             raise ValueError('Optional keyword data_type only be ["params", "json", "data", "file"]')
         if self.files:
             self.headers.pop('Content-Type')
+        # 提前初始化，确保 finally 块中始终可以引用该变量；
+        # 若 try 第一行即抛异常（如网络不可达），外层 except 会为它赋值，
+        # 但若 except 块本身也抛异常（如 write_csv 失败），finally 就会遇到
+        # UnboundLocalError，把真正的错误信息完全淹没。
+        request_info_dct = {}
         try:
-            r = session_dct.get(self.email).request(url=self.full_url,
-                                                    method=self.http_method,
-                                                    params=self.params_dict,
-                                                    data=payload_data,
-                                                    json=payload_json,
-                                                    files=self.files,
-                                                    timeout=60,
-                                                    # proxies={"https": "http://127.0.0.1:9999"},
-                                                    verify=False,
-                                                    headers=self.headers)
+            r = session_dct.get(self.username).request(url=self.full_url,
+                                                       method=self.http_method,
+                                                       params=self.params_dict,
+                                                       data=payload_data,
+                                                       json=payload_json,
+                                                       files=self.files,
+                                                       timeout=60,
+                                                       # proxies={"https": "http://127.0.0.1:9999"},
+                                                       verify=False,
+                                                       headers=self.headers)
             status_code = r.status_code
             response_length = len(r.content)
             response_time = r.elapsed.total_seconds()
@@ -212,4 +229,4 @@ if __name__ == '__main__':
     logger.debug(f'{request_info_dct=}')
     response_data = request_info_dct['response_data']
     logger.debug(f'{response_data=}')
-    cc = AppApiBase(email='tester@yourapp.com', password='your-password', need_login=True)
+    cc = AppApiBase(username='tester@yourapp.com', password='your-password', need_login=True)

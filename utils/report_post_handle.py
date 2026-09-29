@@ -31,7 +31,6 @@ def analyze_allure_report(allure_xml_dir="report/xml"):
     :return: defaultdict(int)
     """
     logger.info(f'{allure_xml_dir=}')
-    assert os.path.exists(allure_xml_dir)
     json_files = glob.glob(f'{allure_xml_dir}/*-result.json')
     # logger.debug(json_files)
     total_times = 0
@@ -46,7 +45,6 @@ def analyze_allure_report(allure_xml_dir="report/xml"):
             case_result_dct[history_id]['status'] = []
             case_result_dct[history_id]['fullName'] = jdata.get('name')
         case_result_dct[history_id]['status'].append(status_case)
-    # pprint(case_statuss_dct)
     # logger.debug(len(case_result_dct))
     result_dct = defaultdict(int)
     retry_passed_case_names: list = list()
@@ -152,7 +150,7 @@ def allure_report_send_alert(allure_xml_dir=None, csv_rootdir=None):
         msg_text += f'. The Failed/Broken cases are:\n'
         msg_text += cases_result.get('failed_broken_only_case_name')
     msg_text += '\n' + '-' * 25
-    msg_text += f'\nThe Server: {base_config.base_url} user account: {base_config.email}, run api autotest on: {socket.gethostname()} {myip}'
+    msg_text += f'\nThe Server: {base_config.base_url} user account: {base_config.username}, run api autotest on: {socket.gethostname()} {myip}'
     msg_text += f'\nFor details: https://allure.testxxx.com/allure_html_api/{date_hour_minute_str}/\n'
     logger.info(f'{myip=} {all_api_good=}')
     api_issues_html_dir = os.path.join(project_root_dir, 'report', 'api_issues')

@@ -1,14 +1,18 @@
 <!DOCTYPE html>
-<html lang="utf-8">
-
+<html lang="zh-CN">
 <head>
-    {% block head %}
     <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}' </title>
-    {% endblock %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Demo{% endblock %}</title>
+    {% block head %}{% endblock %}
 </head>
-
 <body>
+    {% block user_status %}
+    {% include '_user_status.html' %}
+    {% endblock %}
+
+    <p><a href="/">返回首页</a></p>
+
     {% block body %}
     {% endblock %}
 </body>

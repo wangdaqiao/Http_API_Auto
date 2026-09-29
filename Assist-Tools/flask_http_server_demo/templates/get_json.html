@@ -1,47 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome -- Get Json</title>
-    <script>
-        function submitForm() {
-            const name = document.getElementById('name').value;
-            const age = document.getElementById('age').value;
+{% extends 'base.html' %}
 
-            const data = {
-                name: name,
-                age: age
-            };
+{% block title %}Welcome -- Get Json{% endblock %}
 
-            const xhr = new XMLHttpRequest();
-            const url = `/v1/get/json?name=${encodeURIComponent(name)}&age=${encodeURIComponent(age)}`;
-            xhr.open('GET', url, true);
-            xhr.setRequestHeader('Content-Type', 'application/json');
-            xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    document.getElementById('message').textContent = response.message;
-                }
-            };
-            xhr.send();
-        }
-    </script>
-</head>
-<body>
+{% block body %}
     <h1>Welcome get json</h1>
     <label>
         Name:
         <input type="text" id="name">
     </label>
-    <br>
-    <br>
+    <br><br>
     <label>
         Age:
         <input type="number" id="age">
     </label>
-    <br>
-    <br>
+    <br><br>
     <button onclick="submitForm()">Submit</button>
     <p id="message"></p>
-</body>
-</html>
+
+    <script>
+        function submitForm() {
+            const name = document.getElementById('name').value;
+            const age = document.getElementById('age').value;
+
+            const xhr = new XMLHttpRequest();
+            const url = `/v1/get/json?name=${encodeURIComponent(name)}&age=${encodeURIComponent(age)}`;
+            xhr.open('GET', url, true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    const messageEl = document.getElementById('message');
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        messageEl.textContent = response.message;
+                        messageEl.style.color = '#1a7f37';
+                    } else {
+                        let errText = xhr.responseText;
+                        try {
+                            const errJson = JSON.parse(xhr.responseText);
+                            errText = errJson.error || errJson.message || errText;
+                        } catch (e) {}
+                        messageEl.textContent = errText;
+                        messageEl.style.color = '#cf222e';
+                    }
+                }
+            };
+            xhr.send();
+        }
+    </script>
+{% endblock %}

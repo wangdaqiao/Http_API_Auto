@@ -40,7 +40,7 @@ def generate_environment_propertiesfile(folder=None):
     :return:
     """
     environment_info = f'The_Server = {base_config.base_url}'
-    environment_info += f'\nTest_account = {base_config.email}'
+    environment_info += f'\nTest_account = {base_config.username}'
     environment_info += f'\nHostname = {socket.gethostname()}'
     # environment_info += f'\nPython_Version = 3.10'
     # environment_info += f'\nallure_Version = 2.17'
@@ -76,7 +76,7 @@ if __name__ == '__main__':
         sys.exit()
     logger.info(f'{case_extra_lsts=}')
     logger.info(f'The_Server = {base_config.base_url}')
-    logger.info(f'Test_account = {base_config.email}')
+    logger.info(f'Test_account = {base_config.username}')
     logger.info(f'run_env = {base_config.env_name}')
 
     # 并行交由 pytest-xdist（-n N）处理；这里仅按配置逐组顺序执行 pytest，
@@ -101,4 +101,3 @@ if __name__ == '__main__':
     # 不要用 os.system 拼引号：命令以 " 开头且引号数超过 2 个时，cmd /c 会剥掉首尾引号导致命令失效，
     # 改为 subprocess 传参数列表，避免 cmd 的引号解析问题。serve 为阻塞式服务，Ctrl+C 结束。
     subprocess.run([allure_bin, 'serve', str(allure_xml_dir)], check=True)
-

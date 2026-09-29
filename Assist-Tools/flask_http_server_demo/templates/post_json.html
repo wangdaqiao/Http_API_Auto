@@ -1,8 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome -- Post Json</title>
+{% extends 'base.html' %}
+
+{% block title %}Welcome -- Post Json{% endblock %}
+
+{% block body %}
+    <h1>Welcome post json</h1>
+    <label>
+        Name:
+        <input type="text" id="name">
+    </label>
+    <br><br>
+    <label>
+        Age:
+        <input type="number" id="age">
+    </label>
+    <br><br>
+    <button onclick="submitForm()">Submit</button>
+    <p id="message"></p>
+
     <script>
         function submitForm() {
             const name = document.getElementById('name').value;
@@ -15,30 +29,24 @@
             xhr.open('POST', '/v1/post/json', true);
             xhr.setRequestHeader('Content-Type', 'application/json');
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    document.getElementById('message').textContent = response.message;
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    const messageEl = document.getElementById('message');
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        messageEl.textContent = response.message;
+                        messageEl.style.color = '#1a7f37';
+                    } else {
+                        let errText = xhr.responseText;
+                        try {
+                            const errJson = JSON.parse(xhr.responseText);
+                            errText = errJson.error || errJson.message || errText;
+                        } catch (e) {}
+                        messageEl.textContent = errText;
+                        messageEl.style.color = '#cf222e';
+                    }
                 }
             };
             xhr.send(JSON.stringify(data));
         }
     </script>
-</head>
-<body>
-    <h1>Welcome post json</h1>
-    <label>
-        Name:
-        <input type="text" id="name">
-    </label>
-    <br>
-    <br>
-    <label>
-        Age:
-        <input type="number" id="age">
-    </label>
-    <br>
-    <br>
-    <button onclick="submitForm()">Submit</button>
-    <p id="message"></p>
-</body>
-</html>
+{% endblock %}

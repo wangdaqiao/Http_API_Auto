@@ -12,7 +12,7 @@ test:
     base_url: 'http://127.0.0.1:5000/'
     # priority： case priority to run
     priorities: ['p0', 'p1']
-    email: 'your_email@****.**'
+    username: 'your_username'
     password: 'your_password'
     admin_account: 'your_admin_account'
     admin_password: 'your_password'
@@ -20,8 +20,8 @@ test:
 prod:
     base_url: 'https://api.yourapp.com'
     # priority： case priority to run
-    priorities: ['p1',]
-    email: 'your_email@****.**'
+    priorities: ['p0', 'p1', 'p2']
+    username: 'your_username'
     password: 'your_password'
     admin_account: 'your_admin_account'
     admin_password: 'your_password'

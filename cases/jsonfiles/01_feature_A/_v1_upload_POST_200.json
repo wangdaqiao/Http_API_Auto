@@ -3,7 +3,7 @@
     "properties": {
         "msg": {
             "type": "string",
-            "pattern":"uploaded successful$"
+            "pattern":"uploaded file correctly"
         }
     },
     "required": [

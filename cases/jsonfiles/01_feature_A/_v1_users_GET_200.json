@@ -13,7 +13,7 @@
                 "lastname": {
                     "type": "string"
                 },
-                "email": {
+                "username": {
                     "type": "string"
                 },
                 "is_verified": {
@@ -36,7 +36,7 @@
                 "current_employer",
                 "current_plan",
                 "current_title",
-                "email",
+                "username",
                 "firstname",
                 "image_url",
                 "isInfluencer",

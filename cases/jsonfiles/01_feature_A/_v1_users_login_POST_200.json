@@ -1,0 +1,23 @@
+{
+    "type": "object",
+    "properties": {
+        "csrf-token": {
+            "type": "string"
+        },
+        "data": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        },
+        "username": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "csrf-token",
+        "data",
+        "path",
+        "username"
+    ]
+}

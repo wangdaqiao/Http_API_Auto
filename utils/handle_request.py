@@ -121,14 +121,14 @@ def str_vars_to_obj(text: str = '', vars_dct: dict | None = None) -> Any:
         return string_text
 
 
-def preprocess_send_request(case_data, email=None, password=None, vars_dct=None,
+def preprocess_send_request(case_data, username=None, password=None, vars_dct=None,
                             caller_file: str | None = None) -> dict:
     """
     Preprocess a case(dict built from csv): substitute ${var}, parse params/payload, then send the HTTP request.
 
     Args:
         case_data (dict): one case dict, see utils/csv_parse.csv_to_cases.
-        email/password: override the account from config/config.yaml.
+        username/password: override the account from config/config.yaml.
         vars_dct (dict): variables extracted by previous apis, used for ${var} substitution.
         caller_file: 调用方文件名，用于定位 upload_files 目录和命名录制 csv。
             默认为 None 时从调用栈取；若调用链被装饰器/中间层包了一层就容易取错，
@@ -182,7 +182,7 @@ def preprocess_send_request(case_data, email=None, password=None, vars_dct=None,
             upload_file_handler = open(upload_file_path, 'rb')
             files = {'file': (os.path.basename(upload_file_path), upload_file_handler)}
         obj = AppApiBase(url=request_url, http_method=http_method, data_type=data_type, params_dict=params_dict,
-                         payload_dict=payload_dict, files=files, email=email, password=password)
+                         payload_dict=payload_dict, files=files, username=username, password=password)
         request_info: dict = obj.http_request(called_py=called_py)
     finally:
         if upload_file_handler:
@@ -258,7 +258,7 @@ class TestSuite:
         assert bb == 'abcd@aa.info'
 
     def test_03(self):
-        payload_str = '{"recipients":[{"email":"${mail_receiver}","name":"testmail"}],"message":"somethingoptionalmessage","configuration":"{\\"currentStep\\":2,\\"userId\\":\\"${userId}\\",\\"singleCompany\\":true}}","company":"Microsoft","titles":"JavaDeveloper"}'
+        payload_str = '{"recipients":[{"username":"${mail_receiver}","name":"testmail"}],"message":"somethingoptionalmessage","configuration":"{\\"currentStep\\":2,\\"userId\\":\\"${userId}\\",\\"singleCompany\\":true}}","company":"Microsoft","titles":"JavaDeveloper"}'
         vars_dct = {'userId': 'abcd1234', 'firstname': 'T', 'history_id': 422776, 'mail_receiver': 'cdccdd@ccc.inf'}
         cc = str_vars_to_obj(text=payload_str, vars_dct=vars_dct)
         # logger.debug(cc)
@@ -274,7 +274,7 @@ class TestSuite:
         assert dd == []
 
     def test_05(self):
-        data_str = '${not_exist_email}'
+        data_str = '${not_exist_username}'
         vars_dct = {}
         ee = str_vars_to_obj(text=data_str, vars_dct=vars_dct)
         logger.debug(f'return {ee}')

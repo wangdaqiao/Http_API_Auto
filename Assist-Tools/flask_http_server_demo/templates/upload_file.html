@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}File Upload{% endblock %}
+
+{% block body %}
+    <h1>File Upload</h1>
+    <form id="uploadForm">
+        <input type="file" id="file" name="file" required />
+        <br><br>
+        <button type="submit" id="upload">Upload Now</button>
+    </form>
+    <p id="message"></p>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const fileInput = document.getElementById('file');
+            const messageEl = document.getElementById('message');
+
+            if (!fileInput.files || fileInput.files.length === 0) {
+                messageEl.textContent = '请先选择文件';
+                messageEl.style.color = '#cf222e';
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/v1/upload', true);
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    let res = {};
+                    try {
+                        res = JSON.parse(xhr.responseText);
+                    } catch (err) {}
+
+                    if (xhr.status === 200) {
+                        messageEl.textContent = res.msg || '上传成功';
+                        messageEl.style.color = '#1a7f37';
+                    } else {
+                        messageEl.textContent = '上传失败: ' + (res.error || res.msg || xhr.responseText);
+                        messageEl.style.color = '#cf222e';
+                    }
+                }
+            };
+            xhr.onerror = function() {
+                messageEl.textContent = '网络错误，请稍后重试';
+                messageEl.style.color = '#cf222e';
+            };
+            xhr.send(formData);
+        });
+    </script>
+{% endblock %}

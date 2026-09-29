@@ -40,7 +40,7 @@ priorities = env_info.get('priorities', priorities)
 
 
 base_url = env_info.get('base_url')
-email = env_info.get('email')
+username = env_info.get('username')
 password = env_info.get('password')
 need_login = env_info.get('need_login')
 admin_account = env_info.get('admin_account')
@@ -50,6 +50,6 @@ admin_password = env_info.get('admin_password')
 if __name__ == '__main__':
     logger.debug(f'{env_name=}')
     logger.debug(f'{base_url=}')
-    logger.debug(f'{email=}')
+    logger.debug(f'{username=}')
     logger.debug(f'{priorities=}')
 

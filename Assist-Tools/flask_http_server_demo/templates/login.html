@@ -1,0 +1,186 @@
+{% extends 'base.html' %}
+
+{% block title %}登录{% endblock %}
+
+{% block head %}
+<style>
+    body {
+        margin: 0;
+        padding: 48px 16px;
+        background: #f5f7fa;
+        font-family: sans-serif;
+    }
+    .login-container {
+        display: flex;
+        justify-content: center;
+        margin-top: 20px;
+    }
+    .login-card {
+        width: 100%;
+        max-width: 360px;
+        padding: 28px;
+        background: #fff;
+        border: 1px solid #e1e4e8;
+        border-radius: 8px;
+        box-shadow: 0 3px 12px rgba(0, 0, 0, .08);
+    }
+    label {
+        display: block;
+        margin: 16px 0 6px;
+        font-weight: 600;
+    }
+    input {
+        box-sizing: border-box;
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #c9d1d9;
+        border-radius: 4px;
+        font-size: 14px;
+    }
+    button {
+        width: 100%;
+        margin-top: 24px;
+        padding: 10px;
+        border: 0;
+        border-radius: 4px;
+        color: #fff;
+        background: #0969da;
+        cursor: pointer;
+        font-size: 15px;
+    }
+    button:disabled {
+        cursor: wait;
+        opacity: .65;
+    }
+    .message {
+        display: none;
+        margin: 16px 0 0;
+    }
+    .success { color: #1a7f37; }
+    .error { color: #cf222e; }
+    .session-info { color: #57606a; font-size: 13px; word-break: break-all; }
+    .hint { color: #57606a; font-size: 13px; }
+    code { padding: 2px 4px; background: #f6f8fa; border-radius: 3px; }
+</style>
+{% endblock %}
+
+{% block user_status %}{% endblock %}
+
+{% block body %}
+    <div class="login-container">
+        <main class="login-card">
+            <h1>用户登录</h1>
+            <p id="loadingMessage" class="message" style="display: block;">正在获取登录状态...</p>
+            <section id="userInfo" hidden>
+                <p id="loggedInMessage" class="message success" style="display: block;"></p>
+                <p id="userDetails" class="session-info"></p>
+                <button id="logoutButton" type="button">退出登录</button>
+            </section>
+            <form id="loginForm" hidden>
+                <label for="username">用户名</label>
+                <input id="username" name="username" autocomplete="username" required>
+
+                <label for="password">密码</label>
+                <input id="password" name="password" type="password"
+                       autocomplete="current-password" required>
+
+                <button type="submit">登录</button>
+                <p class="hint">演示账号：admin / admin123，tester / tester123</p>
+            </form>
+            <p id="message" class="message" role="status" aria-live="polite"></p>
+        </main>
+    </div>
+
+    <script>
+        const form = document.getElementById('loginForm');
+        const userInfo = document.getElementById('userInfo');
+        const loadingMessage = document.getElementById('loadingMessage');
+        const loggedInMessage = document.getElementById('loggedInMessage');
+        const userDetails = document.getElementById('userDetails');
+        const message = document.getElementById('message');
+
+        function showLoginForm() {
+            loadingMessage.style.display = 'none';
+            userInfo.hidden = true;
+            form.hidden = false;
+        }
+
+        function showUserInfo(data) {
+            loadingMessage.style.display = 'none';
+            form.hidden = true;
+            userInfo.hidden = false;
+            loggedInMessage.textContent = '当前已登录用户: ' + data.username + '，欢迎你！';
+            userDetails.textContent = data.message;
+        }
+
+        async function loadUserInfo() {
+            try {
+                const response = await fetch('/v1/userInfo');
+                const data = await response.json();
+                if (response.status === 401) {
+                    showLoginForm();
+                    return;
+                }
+                if (!response.ok) {
+                    throw new Error(data.message || data.error || '获取用户信息失败');
+                }
+                if (!data.logged_in) {
+                    showLoginForm();
+                    return;
+                }
+                showUserInfo(data);
+            } catch (error) {
+                loadingMessage.textContent = error.message;
+                loadingMessage.className = 'message error';
+                form.hidden = true;
+            }
+        }
+
+        document.getElementById('logoutButton').addEventListener('click', async function (event) {
+            const logoutButton = event.currentTarget;
+            logoutButton.disabled = true;
+            try {
+                const response = await fetch('/v1/logout', {method: 'POST'});
+                if (!response.ok) {
+                    throw new Error('退出登录失败');
+                }
+                window.location.reload();
+            } catch (error) {
+                logoutButton.disabled = false;
+                message.textContent = error.message;
+                message.className = 'message error';
+                message.style.display = 'block';
+            }
+        });
+
+        form.addEventListener('submit', async function (event) {
+            event.preventDefault();
+            message.style.display = 'none';
+            const button = form.querySelector('button');
+            button.disabled = true;
+            try {
+                const response = await fetch('/v1/users/login', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({
+                        username: form.username.value.trim(),
+                        password: form.password.value
+                    })
+                });
+                const data = await response.json();
+                if (!response.ok) {
+                    throw new Error(data.error || '登录失败');
+                }
+                await loadUserInfo();
+            } catch (error) {
+                message.textContent = error.message;
+                message.className = 'message error';
+                message.style.display = 'block';
+            } finally {
+                button.disabled = false;
+            }
+        });
+
+        loadUserInfo();
+    </script>
+{% endblock %}

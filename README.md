@@ -39,7 +39,7 @@
 - [x] feature B Demo API
 
 - ### config
-- [base_config.py](config/base_config.py)：读取 'config.yaml' 文件以获取 base_url、email和password，...
+- [base_config.py](config/base_config.py)：读取 'config.yaml' 文件以获取 base_url、username和password，...
 - [config.yaml](config/config.yaml): 填写测试环境，base_url, 账号、密码，要执行的case优先级等信息。
 对于 `case_pytest_lst` 里每项实际是pytest的参数，如`-n`表示pytest-xdist多进程。
 

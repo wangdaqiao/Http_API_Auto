@@ -1,8 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Welcome -- Get Form</title>
+{% extends 'base.html' %}
+
+{% block title %}Welcome -- Get Form{% endblock %}
+
+{% block body %}
+    <h2>Welcome get form</h2>
+    <label>
+        Name:
+        <input type="text" id="name">
+    </label>
+    <br><br>
+    <label>
+        Age:
+        <input type="number" id="age">
+    </label>
+    <br><br>
+    <button onclick="submitForm()">Submit</button>
+    <p id="message"></p>
+
     <script>
         function submitForm() {
             const name = document.getElementById('name').value;
@@ -15,32 +29,25 @@
             const url = `/v1/get/form?${params.toString()}`;
             const xhr = new XMLHttpRequest();
             xhr.open('GET', url, true);
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.onreadystatechange = function() {
-                if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
-                    const response = JSON.parse(xhr.responseText);
-                    document.getElementById('message').textContent = response.message;
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    const messageEl = document.getElementById('message');
+                    if (xhr.status === 200) {
+                        const response = JSON.parse(xhr.responseText);
+                        messageEl.textContent = response.message;
+                        messageEl.style.color = '#1a7f37';
+                    } else {
+                        let errText = xhr.responseText;
+                        try {
+                            const errJson = JSON.parse(xhr.responseText);
+                            errText = errJson.error || errJson.message || errText;
+                        } catch (e) {}
+                        messageEl.textContent = errText;
+                        messageEl.style.color = '#cf222e';
+                    }
                 }
             };
             xhr.send();
         }
     </script>
-</head>
-<body>
-    <h2>Welcome get form</h2>
-    <label>
-        Name:
-        <input type="text" id="name">
-    </label>
-    <br>
-    <br>
-    <label>
-        Age:
-        <input type="number" id="age">
-    </label>
-    <br>
-    <br>
-    <button onclick="submitForm()">Submit</button>
-    <p id="message"></p>
-</body>
-</html>
+{% endblock %}

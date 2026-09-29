@@ -21,32 +21,29 @@ from utils import common_funs
 from utils import handle_request
 from config import base_config
 
-
-email = base_config.admin_account
+username = base_config.admin_account
 password = base_config.admin_password
 
 cur_filename, _ = os.path.splitext(os.path.basename(__file__))
 logfile = os.path.join(base_config.logs_dir, f'API_{base_config.date_hour_minute_str}_{cur_filename}.log')
-cases_total: list = csv_parse.cases_from_csv_dir(csv_dir=cur_dir, email=email)
-# cases_total = csv_parse.csv_to_cases(csvfile_input=os.path.join(cur_dir, '01_feature_b.csv'), email=email)
+cases_total: list = csv_parse.cases_from_csv_dir(csv_dir=cur_dir, username=username)
+# cases_total = csv_parse.csv_to_cases(csvfile_input=os.path.join(cur_dir, '01_feature_b.csv'), username=username)
 case_ids = common_funs.case_ids_define(cases_total)
 vars_dct = {}
 
 
 def setup_module():
     vars_dct['t1'] = time.time()
-    # 只挂本模块的日志文件 handler，绝不 logger.remove()，
-    # 否则会清掉主进程 run_api_cases.py 注册的 summary 日志及其它模块的 handler
     common_funs.add_file_logger(logfile)
     logger.info(f'{cases_total=}')
+    logger.info(f'case number: {len(cases_total)}')
     logger.info('setup_module starts.')
-    logger.debug(f'case number: {len(cases_total)}')
 
 
 def teardown_module():
     logger.info('teardown_module starts.')
     t2 = time.time()
-    logger.info(f'{base_config.email=}')
+    logger.info(f'{base_config.username=}')
     logger.info(f'cost time: {t2 - vars_dct.get("t1")} s')
 
 
@@ -68,7 +65,7 @@ class TestSuite_01_FeatureB_Admin_User(object):
         var_extract: str = case_data.get('var_extract')
         logger.debug(f'extract vars before {vars_dct=}')
         request_info = handle_request.preprocess_send_request(case_data,
-                                                              email=email,
+                                                              username=username,
                                                               password=password,
                                                               vars_dct=vars_dct)
         response_data: dict = request_info.get('response_data')

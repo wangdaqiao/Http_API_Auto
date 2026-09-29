@@ -1,45 +1,48 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8">
-  <title>Update User</title>
-</head>
-<body>
-  <h1>Update User</h1>
-  <form id="update-user-form">
-    <label for="name">Name:</label>
-    <input type="text" id="name" name="name" required>
-    <br>
-    <br>
-    <label for="age">Age:</label>
-    <input type="number" id="age" name="age" required>
-    <br>
-    <br>
-    <button type="submit">Update</button>
-  </form>
-  <div id="message"></div>
-  <script>
-  document.getElementById('update-user-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    var name = document.getElementById('name').value;
-    var age = document.getElementById('age').value;
-    var data = { name: name, age: age };
-    var xhr = new XMLHttpRequest();
-    xhr.open('PUT', '/v1/put/user', true);
-    xhr.setRequestHeader('Content-Type', 'application/json');
-    xhr.onload = function() {
-      if (xhr.status === 200) {
-        var response = JSON.parse(xhr.responseText);
-        document.getElementById('message').textContent = response.message;
-      } else {
-        console.error(xhr.responseText);
-      }
-    };
-    xhr.onerror = function() {
-      console.error('Network error.');
-    };
-    xhr.send(JSON.stringify(data));
-  });
-  </script>
-</body>
-</html>
+{% extends 'base.html' %}
+
+{% block title %}Update User{% endblock %}
+
+{% block body %}
+    <h1>Update User</h1>
+    <form id="update-user-form">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name" required>
+        <br><br>
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required>
+        <br><br>
+        <button type="submit">Update</button>
+    </form>
+    <div id="message" style="margin-top: 12px;"></div>
+
+    <script>
+    document.getElementById('update-user-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        var name = document.getElementById('name').value;
+        var age = document.getElementById('age').value;
+        var messageEl = document.getElementById('message');
+        var data = { name: name, age: age };
+        var xhr = new XMLHttpRequest();
+        xhr.open('PUT', '/v1/put/user', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onload = function() {
+            var response = {};
+            try { response = JSON.parse(xhr.responseText); } catch(err) {}
+            if (xhr.status === 200) {
+                messageEl.textContent = response.message || '更新成功';
+                messageEl.style.color = '#1a7f37';
+            } else {
+                messageEl.textContent = '更新失败: ' + (response.error || response.message || xhr.responseText);
+                messageEl.style.color = '#cf222e';
+                console.error(xhr.responseText);
+            }
+        };
+        xhr.onerror = function() {
+            messageEl.textContent = '网络错误，请稍后重试';
+            messageEl.style.color = '#cf222e';
+            console.error('Network error.');
+        };
+        xhr.send(JSON.stringify(data));
+    });
+    </script>
+{% endblock %}

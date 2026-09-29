@@ -1,0 +1,19 @@
+{
+    "type": "object",
+    "properties": {
+        "current_time": {
+            "type": "string"
+        },
+        "name": {
+            "type": "string"
+        },
+        "path": {
+            "type": "string"
+        }
+    },
+    "required": [
+        "current_time",
+        "name",
+        "path"
+    ]
+}

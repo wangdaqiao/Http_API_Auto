@@ -20,13 +20,13 @@ from config import base_config
 
 
 
-def csv_to_cases(csvfile_input, email=None) -> list:
+def csv_to_cases(csvfile_input, username=None) -> list:
     """
     Convert a CSV file into a list of dictionary objects representing test cases.
 
     Args:
         csvfile_input (str): The path to the input CSV file.
-        email (str): The test account name.
+        username (str): The test account name.
 
     Returns:
         list: A list of dictionary objects representing test cases. Each dictionary contains the following keys:
@@ -50,6 +50,7 @@ def csv_to_cases(csvfile_input, email=None) -> list:
             continue
         http_method = row['method'].lower()
         row['http_method'] = http_method
+        row['case_id'] = f"{index}_{request_url}"
         # filter priority case
         priority_str = row.get('priority', 'p1')
         if priority_str not in priorities:
@@ -61,10 +62,10 @@ def csv_to_cases(csvfile_input, email=None) -> list:
         if run_env_from_csv.lower() != 'all' and run_env_from_sys_argv != run_env_from_csv:
             logger.debug(f'{run_env_from_csv=}, {run_env_from_sys_argv=}')
             continue
-        # filter test_account
+        # filter test account
         test_account = row.get('test_account', 'all')
-        if test_account.lower() != 'all' and test_account != email:
-            logger.debug(f'{test_account=}, {email=}')
+        if test_account.lower() != 'all' and test_account != username:
+            logger.debug(f'{test_account=}, {username=}')
             continue
         status_code = row.get('status_code')
         # logger.debug(f'{status_code=} {type(status_code)}')
@@ -99,12 +100,15 @@ def csv_to_cases(csvfile_input, email=None) -> list:
     return data_total
 
 
-def cases_from_csv_dir(csv_dir=None, email=None):
-    csv_lst = [os.path.join(csv_dir, x) for x in os.listdir(csv_dir) if x.endswith('.csv')]
+def cases_from_csv_dir(csv_dir=None, username=None):
+    csv_lst = sorted(
+        [os.path.join(csv_dir, x) for x in os.listdir(csv_dir) if x.endswith('.csv')],
+        key=lambda path: os.path.basename(path),
+    )
     logger.debug(f'{csv_lst=}')
     data_total = list()
     for csv_file in csv_lst:
-        case_lst = csv_to_cases(csvfile_input=csv_file, email=email)
+        case_lst = csv_to_cases(csvfile_input=csv_file, username=username)
         data_total.extend(case_lst)
     return data_total
 
