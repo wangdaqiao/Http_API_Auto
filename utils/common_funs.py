@@ -50,17 +50,18 @@ def add_file_logger(logfile: str, level: str = 'INFO', enqueue: bool = True) -> 
     return handler_id
 
 
-def get_host_ip():
+def get_host_ip() -> str:
     """
-    Return the IP address of the host
+    Return the IP address of the host.
+    Falls back to '127.0.0.1' if network is unreachable or socket connection fails.
     """
     try:
-        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        s.connect(('8.8.8.8', 80))
-        ip = s.getsockname()[0]
-    finally:
-        s.close()
-    return ip
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+            s.connect(('8.8.8.8', 80))
+            return s.getsockname()[0]
+    except Exception as err:
+        logger.warning(f'Failed to get host IP: {err}, fallback to 127.0.0.1')
+        return '127.0.0.1'
 
 
 def case_ids_define(data_total):
@@ -165,8 +166,8 @@ def df_to_html(df):
                 width: 100%;
             }
             td {
-                border: 2px solid #dd;
-                padding: 2px dashed blue;
+                border: 2px solid #dddddd; 
+                padding: 4px 8px;
                 white-space: nowrap;
                 overflow: auto; /* Displays a horizontal scroll bar when the cell content exceeds the width */
                 max-width: 280px;

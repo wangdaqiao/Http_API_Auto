@@ -108,7 +108,7 @@ def allure_report_send_alert(allure_xml_dir=None, csv_rootdir=None):
         logger.error(f'xml data dir: {allure_xml_dir} not exists.')
         return
     if csv_rootdir is None:
-        csv_rootdir = os.path.join(project_root_dir, base_config.logs_dir)
+        csv_rootdir = base_config.logs_dir
     elif not os.path.isabs(csv_rootdir):
         csv_rootdir = os.path.join(project_root_dir, csv_rootdir)
     if not os.path.exists(csv_rootdir):

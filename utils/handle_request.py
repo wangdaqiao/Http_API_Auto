@@ -130,9 +130,7 @@ def preprocess_send_request(case_data, username=None, password=None, vars_dct=No
         case_data (dict): one case dict, see utils/csv_parse.csv_to_cases.
         username/password: override the account from config/config.yaml.
         vars_dct (dict): variables extracted by previous apis, used for ${var} substitution.
-        caller_file: 调用方文件名，用于定位 upload_files 目录和命名录制 csv。
-            默认为 None 时从调用栈取；若调用链被装饰器/中间层包了一层就容易取错，
-            这种情况下请显式传入 __file__。
+        caller_file: 调用方文件名。
 
     Returns:
         dict: request_info from AppApiBase.http_request(), merged with 'params_dct' & 'payload_dct'.
@@ -173,9 +171,8 @@ def preprocess_send_request(case_data, username=None, password=None, vars_dct=No
     payload_dict = str_vars_to_obj(text=payload_str, vars_dct=vars_dct)
     logger.debug(f'{payload_dict=}')
     # http request
-    # open the upload file right before sending, and make sure it is always closed after the
-    # request, so no file handle is leaked.
     upload_file_handler = None
+    request_info: dict = {}
     try:
         files = None
         if upload_file_path:
@@ -183,7 +180,7 @@ def preprocess_send_request(case_data, username=None, password=None, vars_dct=No
             files = {'file': (os.path.basename(upload_file_path), upload_file_handler)}
         obj = AppApiBase(url=request_url, http_method=http_method, data_type=data_type, params_dict=params_dict,
                          payload_dict=payload_dict, files=files, username=username, password=password)
-        request_info: dict = obj.http_request(called_py=called_py)
+        request_info = obj.http_request(called_py=called_py)
     finally:
         if upload_file_handler:
             upload_file_handler.close()

@@ -1,6 +1,8 @@
 # run env_name: could be [test, prod]
 run_env: test
 
+is_CI_server: false
+
 case_pytest_lst:
     - ['-n', '2', '--dist=loadfile', '-m', 'm1']
 

@@ -5,6 +5,7 @@
 @File    : write_csv.py
 '''
 
+import os
 import csv
 from loguru import logger
 
@@ -16,9 +17,10 @@ def record_request_csv(csvfile_path=None, csv_row_data: dict=None, csv_headers: 
         logger.error('csvfile_path is None')
         return
     try:
-        with open(csvfile_path, "a+", encoding='utf-8', newline='') as csvfile:
+        need_header = not os.path.exists(csvfile_path)
+        with open(csvfile_path, "a", encoding='utf-8', newline='') as csvfile:
             writer = csv.DictWriter(csvfile, fieldnames=csv_headers, extrasaction='ignore')
-            if csvfile.tell() == 0:
+            if need_header:
                 writer.writeheader()
             writer.writerow(csv_row_data)
     except Exception as err:

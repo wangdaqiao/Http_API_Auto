@@ -92,10 +92,8 @@ class AppApiBase(object):
             session.headers.update({'csrf-token': cookies['session']})
             return session
         else:
-            logger.warning(f'response of /v1/users/login: {response}')
-            logger.warning('failed to login, quit now')
-            # sys.exit()
-            logger.error(f'response of /v1/users/login: {response}')
+            logger.error(f'Login failed for user "{username}": no cookie returned. '
+                         f'HTTP status={response.status_code}, body={response.text[:200]}')
             raise RuntimeError(
                 f'Login failed for user "{username}": '
                 f'no cookie returned from {login_url_full}. '
@@ -129,10 +127,6 @@ class AppApiBase(object):
             raise ValueError('Optional keyword data_type only be ["params", "json", "data", "file"]')
         if self.files:
             self.headers.pop('Content-Type')
-        # 提前初始化，确保 finally 块中始终可以引用该变量；
-        # 若 try 第一行即抛异常（如网络不可达），外层 except 会为它赋值，
-        # 但若 except 块本身也抛异常（如 write_csv 失败），finally 就会遇到
-        # UnboundLocalError，把真正的错误信息完全淹没。
         request_info_dct = {}
         try:
             r = session_dct.get(self.username).request(url=self.full_url,
@@ -214,7 +208,7 @@ class AppApiBase(object):
                                      })
         finally:
             logger.info(f'{request_info_dct=}')
-            return request_info_dct
+        return request_info_dct
 
 
 if __name__ == '__main__':

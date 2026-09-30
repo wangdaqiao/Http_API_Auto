@@ -62,8 +62,7 @@ def schema_from_jsonfile(json_schema_file_name) -> dict:
                    f'Please make sure the json_schema_file column of the CSV case points to an existing file. '
                    f'If no json schema validation is expected, leave the json_schema_file cell empty.')
         logger.error(f'{json_schema_file_name} file is not exists')
-        # raise FileNotFoundError(err_msg)
-        return
+        raise FileNotFoundError(err_msg)
     try:
         with open(json_schema_file_fullpath, encoding='utf-8') as fr:
             schema = json.load(fr)

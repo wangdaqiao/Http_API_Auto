@@ -33,11 +33,12 @@ else:
 
 assert env_name.lower() in ['test', 'prod'], f'{env_name=}'
 
+is_CI_server = dct.get('is_CI_server', False)
+
 case_pytest_lst = dct.get('case_pytest_lst', [])
 env_info = dct.get(env_name)
 priorities = dct.get('priorities', ['p0'])
 priorities = env_info.get('priorities', priorities)
-
 
 base_url = env_info.get('base_url')
 username = env_info.get('username')

@@ -50,8 +50,6 @@ def generate_environment_propertiesfile(folder=None):
 
 
 if __name__ == '__main__':
-    # project_root_dir = os.path.dirname(__file__)
-    # sys.path.append(project_root_dir)
     date_hour_minute_str = base_config.date_hour_minute_str
     logfile = os.path.join(base_config.logs_dir, f'API_{date_hour_minute_str}_summary.log')
     logger.add(logfile, level="INFO", enqueue=True)
@@ -68,7 +66,6 @@ if __name__ == '__main__':
     case_extra = []
     # case_extra = ['-m', 'm1']
     # case_extra = ['-m', 'm1', '-k', 'test_01_feature_a']
-    # case_extra = ['-m', 'm1', '-k', 'feature_b']
     try:
         case_extra_lsts: list[list[str]] = [case_extra, ] if case_extra else base_config.case_pytest_lst
     except Exception as err:
@@ -79,9 +76,6 @@ if __name__ == '__main__':
     logger.info(f'Test_account = {base_config.username}')
     logger.info(f'run_env = {base_config.env_name}')
 
-    # 并行交由 pytest-xdist（-n N）处理；这里仅按配置逐组顺序执行 pytest，
-    # 避免外层 multiprocessing 与 xdist 进程数叠加，以及多进程同时写
-    # 同一个 alluredir / summary 日志 / 请求 csv 造成互相覆盖或串扰。
     for index, lst in enumerate(case_extra_lsts, start=1):
         logger.info(f'run pytest part {index}/{len(case_extra_lsts)}')
         run_lst = copy.deepcopy(base_pytest_lst)
@@ -90,14 +84,12 @@ if __name__ == '__main__':
     te = time.time()
     report_post_handle.allure_report_send_alert(allure_xml_dir=allure_xml_dir)
     allure_xml_dir = Path(allure_xml_dir)
-    # Windows 下 allure 通常是 allure.bat，subprocess 不带 shell 时不会匹配 .bat/.cmd，
-    # 会抛 FileNotFoundError: [WinError 2]，因此先用 shutil.which 解析出完整路径。
     allure_bin = shutil.which('allure')
     if not allure_bin:
         raise RuntimeError('未找到 allure 命令，请安装 allure 并将其 bin 目录加入 PATH')
     logger.info(f'{allure_bin=}')
     subprocess.run([allure_bin, 'generate', str(allure_xml_dir), '-o', str(allure_html_dir), '--clean'], check=True)
     logger.info('spend time: {}'.format(te - ts))
-    # 不要用 os.system 拼引号：命令以 " 开头且引号数超过 2 个时，cmd /c 会剥掉首尾引号导致命令失效，
-    # 改为 subprocess 传参数列表，避免 cmd 的引号解析问题。serve 为阻塞式服务，Ctrl+C 结束。
-    subprocess.run([allure_bin, 'serve', str(allure_xml_dir)], check=True)
+    # Only serve report locally if not in CI environment
+    if not getattr(base_config, 'is_CI_server', False):
+        subprocess.run([allure_bin, 'serve', str(allure_xml_dir)], check=True)
