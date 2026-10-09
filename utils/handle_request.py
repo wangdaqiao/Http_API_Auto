@@ -138,7 +138,6 @@ def preprocess_send_request(case_data, username=None, password=None, vars_dct=No
     if caller_file:
         called_filename = caller_file
     else:
-        # 依赖调用方栈帧：这是 CPython 私有 API 且对调用层级敏感，必要时用 caller_file 兜底
         called_filename = sys._getframe().f_back.f_code.co_filename
     called_py, _ = os.path.splitext(os.path.basename(called_filename))
     called_py_dir = os.path.dirname(called_filename)
@@ -218,19 +217,18 @@ def extract_vars(response_data=None, var_extract: str = '', vars_dct: dict | Non
     try:
         var_extract_dct = json.loads(var_extract)
     except json.JSONDecodeError as err:
-        # var_extract 是 csv 里手写的，写错要让用例明确失败并保留上下文，而不是抛裸异常
+        # var_extract 是 csv 里手写的
         pytest.fail(f'invalid var_extract: {var_extract}, json.loads failed: {err}')
         return vars_dct
     for k, v in var_extract_dct.items():
-        # jsonpath 在无匹配 / response_data 为 None / 表达式非法时都返回 False，不会抛异常
         tmp_lst = jsonpath(response_data, v)
-        if not tmp_lst:
-            # 之前是静默跳过，导致下游用例以"变量未提取"被 skip 而无法定位是哪一步没提取到
+        if tmp_lst:
+            logger.debug(f'jsonpath get: {k}={tmp_lst[0]}')
+            vars_dct[k] = tmp_lst[0]
+        else:
             logger.warning(f'jsonpath {v!r} matched nothing, variable {k!r} not extracted. '
                            f'response_data: {_preview(response_data)}')
-            continue
-        logger.debug(f'jsonpath get: {k}={tmp_lst[0]}')
-        vars_dct[k] = tmp_lst[0]
+            vars_dct[k] = None
     return vars_dct
 
 

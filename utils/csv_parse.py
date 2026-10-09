@@ -9,7 +9,6 @@
 
 import os
 import sys
-import json
 import pandas as pd
 from loguru import logger
 from ast import literal_eval
@@ -19,13 +18,12 @@ sys.path.append(project_root_dir)
 from config import base_config
 
 
-
-def csv_to_cases(csvfile_input, username=None) -> list:
+def cases_from_csvfile(csvfile, username=None) -> list:
     """
     Convert a CSV file into a list of dictionary objects representing test cases.
 
     Args:
-        csvfile_input (str): The path to the input CSV file.
+        csvfile (str): The path to the input CSV file.
         username (str): The test account name.
 
     Returns:
@@ -37,7 +35,7 @@ def csv_to_cases(csvfile_input, username=None) -> list:
             - 'status_code' (list): The expected status code(s) for the test case.
             ......
     """
-    df = pd.read_csv(csvfile_input, index_col=False, keep_default_na=False, on_bad_lines='skip', encoding='utf-8')
+    df = pd.read_csv(csvfile, index_col=False, keep_default_na=False, on_bad_lines='skip', encoding='utf-8')
     # df.drop_duplicates(subset=['request_url', 'payload'], inplace=True)
     if 'page_url' in df.columns:
         df.drop(['page_url', ], axis=1, inplace=True)
@@ -50,8 +48,8 @@ def csv_to_cases(csvfile_input, username=None) -> list:
             continue
         http_method = row['method'].lower()
         row['http_method'] = http_method
-        row['case_id'] = f"{index}_{request_url}"
-        # filter priority case
+        row['case_id'] = f"{index}_{request_url}_{http_method}"
+        # filter priority
         priority_str = row.get('priority', 'p1')
         if priority_str not in priorities:
             # logger.debug(f'only run priority: {priorities}. Current case priority is:{priority_str}')
@@ -67,6 +65,7 @@ def csv_to_cases(csvfile_input, username=None) -> list:
         if test_account.lower() != 'all' and test_account != username:
             logger.debug(f'{test_account=}, {username=}')
             continue
+        # status code
         status_code = row.get('status_code')
         # logger.debug(f'{status_code=} {type(status_code)}')
         if not status_code:
@@ -108,12 +107,12 @@ def cases_from_csv_dir(csv_dir=None, username=None):
     logger.debug(f'{csv_lst=}')
     data_total = list()
     for csv_file in csv_lst:
-        case_lst = csv_to_cases(csvfile_input=csv_file, username=username)
+        case_lst = cases_from_csvfile(csvfile=csv_file, username=username)
         data_total.extend(case_lst)
     return data_total
 
 
 if __name__ == '__main__':
-    case_data_lst = csv_to_cases(csvfile_input='demo_cases.csv')
+    case_data_lst = cases_from_csvfile(csvfile='demo_cases.csv')
     logger.debug(f'{case_data_lst=}')
     logger.debug(f'{len(case_data_lst)=}')

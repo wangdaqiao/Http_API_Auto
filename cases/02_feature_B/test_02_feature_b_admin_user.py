@@ -27,7 +27,6 @@ password = base_config.admin_password
 cur_filename, _ = os.path.splitext(os.path.basename(__file__))
 logfile = os.path.join(base_config.logs_dir, f'API_{base_config.date_hour_minute_str}_{cur_filename}.log')
 cases_total: list = csv_parse.cases_from_csv_dir(csv_dir=cur_dir, username=username)
-# cases_total = csv_parse.csv_to_cases(csvfile_input=os.path.join(cur_dir, '01_feature_b.csv'), username=username)
 case_ids = common_funs.case_ids_define(cases_total)
 vars_dct = {}
 
@@ -75,7 +74,7 @@ class TestSuite_01_FeatureB_Admin_User(object):
             # extract_vars 原地写入 vars_dct（返回值就是 vars_dct 本身），无需再 update 一次
             handle_request.extract_vars(response_data=response_data, var_extract=var_extract, vars_dct=vars_dct)
             logger.info(f'after {vars_dct=}')
-            # If you need any other special process
+            # If any other special process -> TODO
             logger.info(f'extract vars after: {vars_dct=}')
         # step 3: json schema validate
         schema_check_result = True

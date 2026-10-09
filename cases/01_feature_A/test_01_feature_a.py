@@ -26,6 +26,7 @@ password = base_config.password
 
 cur_filename, _ = os.path.splitext(os.path.basename(__file__))
 logfile = os.path.join(base_config.logs_dir, f'API_{base_config.date_hour_minute_str}_{cur_filename}.log')
+
 cases_total: list = csv_parse.cases_from_csv_dir(csv_dir=cur_dir, username=username)
 case_ids: list = common_funs.case_ids_define(cases_total)
 vars_dct = {}
@@ -34,7 +35,7 @@ vars_dct = {}
 def setup_module():
     vars_dct['t1'] = time.time()
     common_funs.add_file_logger(logfile)
-    logger.info(f'{cases_total=}')
+    logger.debug(f'{cases_total=}')
     logger.debug(f'case number: {len(cases_total)}')
     logger.info('setup_module starts.')
 
@@ -70,7 +71,7 @@ class TestSuite_01_FeatureA_APIs(object):
             # extract_vars 原地写入 vars_dct（返回值就是 vars_dct 本身），无需再 update 一次
             handle_request.extract_vars(response_data=response_data, var_extract=var_extract, vars_dct=vars_dct)
             logger.info(f'extract vars after: {vars_dct=}')
-            # If need any other special process -> TODO
+            # If any other special process -> TODO
         # step 3: json schema validate
         schema_check_result = jsonschema_validate(response_data=response_data, schema=schema,
                                                   request_info=request_info) if schema else True
