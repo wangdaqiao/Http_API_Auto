@@ -228,7 +228,6 @@ def extract_vars(response_data=None, var_extract: str = '', vars_dct: dict | Non
         else:
             logger.warning(f'jsonpath {v!r} matched nothing, variable {k!r} not extracted. '
                            f'response_data: {_preview(response_data)}')
-            vars_dct[k] = None
     return vars_dct
 
 
